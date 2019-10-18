@@ -15,7 +15,7 @@ while True:
     v_vec = np.array(bc.encode([v])[0])
 
     # count = 0
-# 
+#
     # for x, y in zip(w_vec, v_vec):
         # count += (x * y)
     c = euclidean(w_vec[0], v_vec[0])
