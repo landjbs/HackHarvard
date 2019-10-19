@@ -55,3 +55,12 @@ class Image_Generator():
         Builds and compiles summarizer model to read BERT matrix into vector of
         embeddingDim dimensions.
         """
+        # TODO: IMP SUMMARIZER
+        pass
+
+    def build_generator(self):
+        """
+        Builds generator to convert latent initialization vector of
+        embeddingDim dimensions to third-rank tensor of
+        shape (rowNum, colNum, channelNum)
+        """
