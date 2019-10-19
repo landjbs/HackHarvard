@@ -20,6 +20,7 @@ from processing.cleaner import clean_text, clean_url
 
 bc = BertClient(check_length=True)
 
+<<<<<<< HEAD
 def find_bert(imArray):
     bert = np.zeros(1024)
     bert[:256] = imArray[:,-2,0]
@@ -28,6 +29,8 @@ def find_bert(imArray):
     bert[768:] = imArray[:,-1,1]
     return bert, imArray[:,:-2,:]
 
+=======
+>>>>>>> 3207d3cb54430673ee48dc767b41b4e33d3f7eb6
 class Metrics():
     """ Class to keep track of scrape progress """
     def __init__(self):

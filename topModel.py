@@ -7,6 +7,7 @@ pair is taught to capture the important details of an input text and to use
 them to construct and image that is both realistic and topical.
 """
 
+import numpy as np
 from keras.models import Model, Sequential, load_model
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
@@ -337,7 +338,7 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, folderPath, batchSize):
+    def train_models(self, folderPath, iter, batchSize):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
@@ -347,14 +348,82 @@ class Image_Generator():
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
         """
+        u.assert_type('folderPath', folderPath, str)
+        u.assert_type('iter', iter, int)
+        u.assert_type('batchSize', batchSize, int)
+        u.assert_pos('iter', iter)
+        u.assert_pos('batchSize', batchSize)
 
         fileList = [f'{file}' for file in os.listdir(folderPath)]
+        fileNum = len(fileList)
 
-        def make_discriminator_batch():
+        def make_discriminator_batch(captions, images):
             """
             Makes discriminator batch from real images and generated images
             """
-            
+            pass
+
+        def make_describer_batch(captions, images):
+            """
+            Makes describer batch from real caption cls and describer-generated
+            pseudo-cls tokens
+            """
+            pass
+
+        def make_adversarial_batch(captions):
+            """
+            Makes adversarial batch of entirely fake, positively-scored images
+            using captions for generator improvement
+            """
+            pass
+
+        def make_creative_batch(captions, images):
+            """
+            Makes creative batch of fake images and real captions for
+            generator improvement
+            """
+            pass
+
+        def decode_imArray(imArray):
+            """ Pulls encoded bert vector out of imArray and returns tuple """
+            bert = np.zeros(1024)
+            bert[:256] = imArray[:,-2,0]
+            bert[256:512] = imArray[:,-1,0]
+            bert[512:768] = imArray[:,-2,1]
+            bert[768:] = imArray[:,-1,1]
+            return bert
+
+        for i in range(iter):
+            # load array of current batch
+            batchArray = np.load(fileList[(i % fileNum)])
+            # pull caption encodings from batchArray
+            # TODO:
+            # make batches for each model from batchArray
+            (discriminatorX,
+            discriminatorY) = make_discriminator_batch(captions, images)
+            (describerX,
+            describerY) = make_describer_batch(captions, images)
+            (adversarialX,
+            adversarialY) = make_adversarial_batch(captions)
+            (creativeX,
+            creativeY) = make_creative_batch(captions, images)
+            # train each model on respective batch
+            discData = self.discriminatorModel.train_on_batch(discriminatorX,
+                                                            discriminatorY)
+            descData = self.describerModel.train_on_batch(describerX,
+                                                        describerY)
+            advData = self.adversarialModel.train_on_batch(adversarialX,
+                                                            adversarialY)
+            creativeData = self.creativeModel.train_on_batch(creativeX,
+                                                            creativeY)
+            # round and log
+            discL, discA = round(discData[0], 3), round(discData[1], 3)
+            descL = round(descData, 3)
+            advL, advA = round(advData[0], 3), round(advData[1], 3)
+            creativeL = round(creativeData, 3)
+            print(f'Cur Step: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
+                f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
+                f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
 
 
