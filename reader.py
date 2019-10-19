@@ -19,21 +19,32 @@ def sample_iter(n):
         yield i
 
 
-def read_dataset(fileName):
+def read_dataset(filePath, batchSize):
     """
     Reads conceptual caption dataset from fileName into list of img/caption
     pairs
     """
-    with open(fileName, 'r') as captionFile:
+    secureMatcher = re.compile(r"https")
+    with open(filePath, 'r') as captionFile:
+        count = 0
         for line in captionFile:
+            count += 1
+            if count == 10:
+                break
             # split line by tab
             lineSplit = re.split('\t', line)
             assert (len(lineSplit)==2), ('line expected length 2, but found '
                                         f'length {len(lineSplit)}')
             lineCap = lineSplit.pop(0)
-            imgFetch = requests.get(lineSplit[0])
-            img = Image.open(BytesIO(imgFetch.content))
+            cleanedURL = re.sub(secureMatcher, "http", lineSplit[0])
+            imgFetch = requests.get(cleanedURL, auth=('user', 'pass'))
+            print(cleanedURL)
+            print(imgFetch)
+            try:
+                img = Image.open(BytesIO(imgFetch.content))
+            except IOError:
+                continue
             print(img)
 
 
-read_dataset('data/inData/captionsTrain.tsv')
+read_dataset('data/inData/captionsTrain.tsv', 1)
