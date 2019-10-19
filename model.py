@@ -17,6 +17,7 @@ import keras.backend as K
 from keras.optimizers import RMSprop
 
 import utils as u
+from processing.image import decode_sample_tensor
 
 
 class Image_Generator():
@@ -401,7 +402,7 @@ class Image_Generator():
             # load array of current batch
             batchArray = np.load(fileList[(i % fileNum)])
             # pull caption encodings from batchArray
-            # TODO:
+            batchArray = decode_sample_tensor()
             # make batches for each model from batchArray
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captions, images)
