@@ -151,7 +151,7 @@ class Image_Generator():
         # TODO: save model and shit
         print(model.summary())
 
-    def build_descriminator(self):
+    def build_discriminator(self):
         """
         Builds desciminator model
         """
@@ -165,7 +165,7 @@ class Image_Generator():
         LEAKY_ALPHA = self.LEAKY_ALPHA
 
 
-        img_in = Input(shape=(IMG_SHAPE, ), name='img_in')
+        img_in = Input(shape=IMG_SHAPE, name='img_in')
         # first conv block
         conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_1')(img_in)
@@ -179,7 +179,29 @@ class Image_Generator():
         drop_2 = Dropout(rate=DROPOUT, name=f'drop_2')(relu_2)
 
         # third conv block
+        conv_3 = Conv2D(filters=64, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_3')(drop_2)
+        relu_3 = LeakyReLU(LEAKY_ALPHA, name=f'relu_3')(conv_3)
+        drop_3 = Dropout(rate=DROPOUT, name=f'drop_3')(relu_3)
 
+        # fourth conv block
+        conv_4 = Conv2D(filters=128, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_4')(drop_3)
+        relu_4 = LeakyReLU(LEAKY_ALPHA, name=f'relu_4')(conv_4)
+        drop_4 = Dropout(rate=DROPOUT, name=f'drop_4')(relu_4)
+
+        # dense net
+        flat = Flatten(name='flat')(drop_4)
+        outputs = Dense(units=1, activation='sigmoid', name='outputs')(flat)
+        model = Model(inputs=img_in, outputs=outputs)
+
+        # TODO: shit
+        print(model.summary())
+
+    def build_describer(self):
+        """
+        
+        """
 
 
 
@@ -187,4 +209,4 @@ class Image_Generator():
 
 
 x = Image_Generator(1,1,1)
-x.build_descriminator()
+x.build_discriminator()
