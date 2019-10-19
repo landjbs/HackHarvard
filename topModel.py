@@ -286,7 +286,13 @@ class Image_Generator():
         """ Uses generator model to generate image from BERT matrix """
         return self.generatorStruct.predict(textVec)
 
-
+    ## TRAINING ##
+    def train(self, ):
+        """
+        Train summarizer, generator, discriminator, describer, adversarial,
+        and creative models on dataset with end-goal of text-to-image
+        generation.
+        """
 
 
 
