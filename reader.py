@@ -14,7 +14,10 @@ from PIL import Image
 # img = Image.open(BytesIO(response.content))
 
 
-def sample_iter
+def sample_iter(n):
+    for i in range(n):
+        yield i
+
 
 def read_dataset(fileName):
     """
@@ -26,10 +29,8 @@ def read_dataset(fileName):
             # split line by tab
             lineSplit = re.split('\t', line)
             assert (len(lineSplit)==2), ('line expected length 2, but found '
-                                         f'length {len(lineSplit)}')
-            # pull
+                                        f'length {len(lineSplit)}')
             lineCap = lineSplit.pop(0)
-            print(lineCap)
             imgFetch = requests.get(lineSplit[0])
             img = Image.open(BytesIO(imgFetch.content))
             print(img)
