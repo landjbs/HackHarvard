@@ -121,12 +121,19 @@ class Image_Generator():
 
         ## THIRD UPSAMPLING BLOCK ##
         upsample_3 = UpSampling2D(name='upsample_3')(relu_2)
-        transpose_3 = Conv2DTranspose(filters=128, kernel_size=KERNEL_SIZE,
+        transpose_3 = Conv2DTranspose(filters=256, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(upsample_3)
         batch_3 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_3')(transpose_3)
         relu_3 = ReLU(name='relu_3')(batch_3)
 
+        ## FOURTH UPSAMPLING BLOCK ##
+        upsample_4 = UpSampling2D(name='upsample_4')(relu_3)
+        transpose_4 = Conv2DTranspose(filters=512, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(upsample_3)
+        batch_4 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_3')(transpose_3)
+        relu_4 = ReLU(name='relu_3')(batch_3)
 
 
 
