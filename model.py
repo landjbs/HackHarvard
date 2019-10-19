@@ -56,6 +56,9 @@ class Image_Generator():
         self.LEAKY_ALPHA        =   0.2
         # default momentum for adjusting mean and var in generator batch norm
         self.NORM_MOMENTUM      =   0.9
+        # initial learning rates [disc,desc,adv,creative]
+        #TODO determine values
+        self.INIT_LR            =   [1,1,0,0]
 
     ## OBJECT UTILS ##
     def __str__(self):
@@ -405,7 +408,13 @@ class Image_Generator():
             creativeY) = make_creative_batch(captions, images)
             # train each model on respective batch
 
-            K.set_value(self.discriminatorModel.optimizer.lr,0.01)
+            if i == 0:
+                self.lr = self.INIT_LR
+
+            K.set_value(self.discriminatorModel.optimizer.lr,self.lr[0])
+            K.set_value(self.describerModel.optimizer.lr,self.lr[1])
+            K.set_value(self.adversarialModel.optimizer.lr,self.lr[2])
+            K.set_value(self.creativeModel.optimizer.lr,self.lr[3])
 
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
@@ -423,6 +432,8 @@ class Image_Generator():
             print(f'Cur Step: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
+
+            self.lr = update_lr()
 
             if (((i % saveInterval) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
