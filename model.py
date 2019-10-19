@@ -362,7 +362,7 @@ class Image_Generator():
 
         return batch, answer_key
     ## TRAINING ##
-    def train_models(self, folderPath, iter, batchSize, saveInt=500):
+    def train_models(self, dataObj, iter, batchSize, saveInt=500):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
@@ -428,7 +428,8 @@ class Image_Generator():
 
         for i in range(iter):
             # load array of current batch
-            batchArray = np.load(fileList[(i % fileNum)])
+            # batchArray = np.load(fileList[(i % fileNum)])
+            captionList, vecList, imList = dataObj.fetch_batch(batchSize)
             # pull caption encodings from batchArray
             bertBatch, imBatch = decode_batchArray(batchArray)
             # make batches for each model from batchArray

@@ -46,29 +46,29 @@ class CocoData():
                     imgId = example['image_id']
                     captionText = text.clean_text(example['caption'])
                     imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
+                    print(imArray.shape)
                     # encode caption and clean image
                     try:
                         captionVec = text.text_to_cls(captionText)
                         cleanedIm = image.filter_image(imArray)
                         yield (captionText, captionVec, imArray)
                     except:
-                        print('ERROR')
                         yield None
 
         if cocoPath:
             error_filter = lambda elt : elt != None
             trainIdx = {i : dataTup for i, dataTup
                         in tqdm(enumerate(coco_reader(cocoPath)))
-                        if not error_filter(dataTup)}
+                        if error_filter(dataTup)}
             self.trainIdx = trainIdx
+            self.indexSize = len(trainIdx)
         else:
             self.trainIdx = None
+            self.indexSize = 0
 
     def __str__(self):
         if self.trainIdx != None:
-            return f'<CocoData Obj | TRAIN_NUM={len(self.trainIdx)}>'
-        else:
-            return f'<CocoData Obj | UNINITIALIZED>'
+            return f'<CocoData Obj | TRAIN_NUM={len(self.indexSize)}>'
 
     def save(self, path):
         """ Saves to path """
@@ -81,11 +81,16 @@ class CocoData():
         assert u.os.path.exists(path), f'path "{path}" not found.'
         self.trainIdx = u.load(f'{path}/trainIdx.sav')
 
+    def fetch_batch(batchSize):
+        """ Fetches random batch of batchSize from trainIdx """
+        return self.trainIdx[np.random.randint(0, self.indexSize, size=batchSize)]
+
+
 coco = CocoData('data/inData/coco2014')
 print(coco.trainIdx)
-for elt in coco.trainIdx:
-    print(elt)
+for elt in coco.trainIdx.values():
     im = elt[2]
+    print(im.shape)
     plt.imshow(elt)
     plt.title(captionText)
     plt.show()
