@@ -78,6 +78,7 @@ class Image_Generator():
 
     def load(self, path):
         """ Loads Image_Generator() saved at path. Sets initialized to True """
+        # FIXME: ERROR: Unknown loss function:loss
         u.assert_type('path', path, str)
         assert (u.os.path.exists(path)), f"path {path} not found."
         # self.summarizerStruct = load_model(f'{path}/summarizerStruct.h5')
@@ -336,25 +337,29 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    # def train_models(self, folderPath):
-    #     """
-    #     Train summarizer, generator, discriminator, describer, adversarial,
-    #     and creative models on dataset with end-goal of text-to-image
-    #     generation.
-    #     Args:
-    #         folderPath:         Path to the folder of np arrays on which to train
-    #         iter:               Number of iterations for which to train
-    #     """
-
-
-
-
+    def train_models(self, folderPath):
+        """
+        Train summarizer, generator, discriminator, describer, adversarial,
+        and creative models on dataset with end-goal of text-to-image
+        generation.
+        Args:
+            folderPath:         Path to the folder of np arrays on which to train
+            iter:               Number of iterations for which to train
+        """
+        pass
 
 
 
 x = Image_Generator()
-x.load('test')
-print(x)
-# print('ini')
-# x.initialize_models()
-# x.save('test')
+x.initialize_models()
+
+
+## PLOTTTING BONES ##
+# import numpy as np
+# import matplotlib.pyplot as plt
+# t = np.expand_dims(np.random.uniform(0,1,size=(1024)), axis=1)
+# print(t.shape)
+# z = x.image_from_textVec(t.T)[0]
+# print(f'Shape: {z.shape}')
+# plt.imshow(z)
+# plt.show()

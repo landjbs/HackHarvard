@@ -13,6 +13,7 @@ def save(object, path, display=True):
         print(f"Object successfully saved to {path}.")
     return True
 
+
 def load(path):
     """ Loads object from path. Wraps pickle for consolidated codebase. """
     file = open(path, "rb")
