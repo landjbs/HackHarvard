@@ -2,7 +2,8 @@ from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape)
-from keras import (sum, sqrt, square) as (kSum, kSqrt, kSquare)
+import keras.backend as K
+
 
 import utils as u
 
@@ -29,12 +30,18 @@ class Image_Generator():
         self.colNum         = colNum
         self.CHANNEL_NUM    = 3
         ## object info ##
-        self.curIter        = 0
-        self.summarizer     = None
-        self.generator      = None
-        self.discriminator  = None
-        self.describer      = None
-        self.init           = False
+        self.curIter                = 0
+        # model architectures
+        self.summarizerStruct       = None
+        self.generatorStruct        = None
+        self.discriminatorStruct    = None
+        self.describerStruct        = None
+        # model compilations
+        self.discriminatorModel     = None
+        self.describerModel         = None
+        self.adversarialModel       = None
+        self.creativeModel          = None
+        self.init                   = False
         ## training specs ##
         # default first-layer filter depth of discriminator
         DIS_DEPTH               =   64
@@ -148,9 +155,8 @@ class Image_Generator():
         relu_6 = ReLU(name='relu_6')(batch_6)
 
         model = Model(inputs=latent_embedding, outputs=relu_6)
-
-        # TODO: save model and shit
-        print(model.summary())
+        self.generator = model
+        return True
 
     def build_discriminator(self):
         """
@@ -195,9 +201,7 @@ class Image_Generator():
         flat = Flatten(name='flat')(drop_4)
         outputs = Dense(units=1, activation='sigmoid', name='outputs')(flat)
         model = Model(inputs=img_in, outputs=outputs)
-
-        # TODO: shit
-        print(model.summary())
+        self.discriminator =
 
     def build_describer(self):
         """
@@ -244,14 +248,15 @@ class Image_Generator():
 
         def distance_loss(layer):
             def loss(y_true,y_pred):
-                return kSqrt(kSum(kSquare(y_pred - y_true), axis=-1))
+                return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
             return loss
 
         model.compile(optimizer='adam',
-              loss=distance_loss(outputs), # Call the loss function with the selected layer
+              loss=distance_loss(outputs),
               metrics=['accuracy'])
 
-        print(model.summary())      
+        print(model.summary())
+
 
 
 
