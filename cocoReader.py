@@ -50,9 +50,9 @@ class CocoData():
                     # encode caption and clean image
                     try:
                         captionVec = text.text_to_cls(captionText)
-                        cleanedIm = image.filter_image(imArray)
+                        cleanedIm = image.filter_image(imArray, outDim=480)
                         yield (captionText, captionVec, imArray)
-                    except:
+                    except Exception as e:
                         yield None
 
         if cocoPath:
