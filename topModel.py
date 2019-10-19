@@ -41,13 +41,9 @@ class Image_Generator():
         self.describerModel         = None
         self.adversarialModel       = None
         self.creativeModel          = None
-        self.init                   = False
+        self.initizalized           = False
         ## training specs ##
-        # default first-layer filter depth of discriminator
-        DIS_DEPTH               =   64
-        self.DIS_DEPTH          =   DIS_DEPTH
-        self.GEN_DEPTH          =   DIS_DEPTH * 4
-        # default dropout; should prevent memorization
+        # default dropout to prevent memorization
         self.DROPOUT            =   0.2
         # default kernel size
         self.KERNEL_SIZE        =   [5, 5]
@@ -55,8 +51,6 @@ class Image_Generator():
         self.STRIDE             =   [2, 2]
         # default alpha of LeakyReLU activation in discriminator
         self.LEAKY_ALPHA        =   0.2
-        # dimensions of generator latent space
-        self.LATENT_DIMS        =   100
         # default momentum for adjusting mean and var in generator batch norm
         self.NORM_MOMENTUM      =   0.9
 
@@ -303,7 +297,16 @@ class Image_Generator():
         self.creativeModel = creativeModel
         return creativeModel
 
-    
+    def build_model(self):
+        self.build_generator()
+        self.build_discriminator()
+        self.build_describer()
+        self.compile_discriminator()
+        self.compile_describer()
+        self.compile_adversarial()
+        self.compile_creative()
+        self.init = True
+
 
 
 
