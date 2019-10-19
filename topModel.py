@@ -66,6 +66,8 @@ class Image_Generator():
     def save(self, path):
         """ Saves Image_Generator() object to path """
         u.assert_type('path', path, str)
+        u.safe_make_folder(path)
+        assert self.initizalized, 'models must be initialized before saving.'
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
     def distance_loss(layer):
