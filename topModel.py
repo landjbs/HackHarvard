@@ -74,19 +74,12 @@ class Image_Generator():
         shape (rowNum, colNum, channelNum)
         """
         ## TRAINING PARAMS ##
-        # number of nodes for dense network at latent stage
         DENSE_NODES     = (8 * 8 * self.EMBEDDING_DIM)
-        # shape of reshaped latent dimensional vec
         LATENT_IMG_SHAPE = (8, 8, self.EMBEDDING_DIM)
-        # momentum of batch norm
         NORM_MOMENTUM   = self.NORM_MOMENTUM
-        # rate of dropout
         DROPOUT = self.DROPOUT
-        # size of kernel
         KERNEL_SIZE = self.KERNEL_SIZE
-        # size of stride
         STRIDE = self.STRIDE
-
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
         latent_embedding = Input(shape=(self.EMBEDDING_DIM, ),
@@ -105,7 +98,6 @@ class Image_Generator():
         # run dropout over reshape latent image
         latent_dropout = Dropout(rate=DROPOUT,
                                 name='latent_dropout')(latent_reshape)
-
         ## FIRST UPSAMPLING BLOCK ##
         transpose_1 = Conv2DTranspose(filters=256, kernel_size=KERNEL_SIZE,
                                     padding='same',
@@ -113,42 +105,37 @@ class Image_Generator():
         batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_1')(transpose_1)
         relu_1 = ReLU(name='relu_1')(batch_1)
-
         ## SECOND UPSAMPLING BLOCK ##
         transpose_2 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(relu_1)
         batch_2 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_2')(transpose_2)
         relu_2 = ReLU(name='relu_2')(batch_2)
-
         ## THIRD UPSAMPLING BLOCK ##
         transpose_3 = Conv2DTranspose(filters=16, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(relu_2)
         batch_3 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_3')(transpose_3)
         relu_3 = ReLU(name='relu_3')(batch_3)
-
         ## FOURTH UPSAMPLING BLOCK ##
         transpose_4 = Conv2DTranspose(filters=8, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(relu_3)
         batch_4 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_4')(transpose_4)
         relu_4 = ReLU(name='relu_4')(batch_4)
-
         ## FIFTH UPSAMPLING BLOCK ##
         transpose_5 = Conv2DTranspose(filters=8, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(relu_4)
         batch_5 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_5')(transpose_5)
         relu_5 = ReLU(name='relu_5')(batch_5)
-
         ## SIXTH UPSAMPLING BLOCK ##
         transpose_6 = Conv2DTranspose(filters=3, kernel_size=KERNEL_SIZE,
                                     padding='same', strides=STRIDE)(relu_5)
         batch_6 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_6')(transpose_6)
         relu_6 = ReLU(name='relu_6')(batch_6)
-
+        # save model
         model = Model(inputs=latent_embedding, outputs=relu_6)
         self.generatorStruct = model
         return True
@@ -188,6 +175,7 @@ class Image_Generator():
         # dense net
         flat = Flatten(name='flat')(drop_4)
         outputs = Dense(units=1, activation='sigmoid', name='outputs')(flat)
+        # model saved
         model = Model(inputs=img_in, outputs=outputs)
         self.discriminatorStruct = model
         return True
@@ -234,6 +222,7 @@ class Image_Generator():
         return True
 
     def compile_discriminator(self, learningRate=0.1, decay=0.1):
+        """ Compiles discriminator model """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         binaryLoss = 'binary_crossentropy'
         discriminatorModel = self.discriminatorStruct
@@ -243,8 +232,7 @@ class Image_Generator():
         return discriminatorModel
 
     def compile_describer(self, learningRate=0.1, decay=0.1):
-        """ FINISH """
-
+        """ Compiles describer using custom distance_loss """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         describerModel = self.describerStruct
         describerModel.compile(optimizer=rmsOptimizer,
@@ -253,7 +241,7 @@ class Image_Generator():
         return describerModel
 
     def compile_adversarial(self, learningRate=0.1, decay=0.1):
-        """ FINSIH """
+        """ Compiles adversarial model as generator -> discriminator """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         binaryLoss = 'binary_crossentropy'
         # adversarial built by passing generator output through discriminator
@@ -266,7 +254,9 @@ class Image_Generator():
         return adversarialModel
 
     def compile_creative(self, learningRate=0.1, decay=0.1):
-        """ to do """
+        """
+        Compiles creative model as generator -> describer using distance_loss
+        """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
 
         creativeModel = Sequential()
@@ -278,6 +268,7 @@ class Image_Generator():
         return creativeModel
 
     def build_model(self):
+        """ Top-level func compiles all models and sets initialized to True """
         assert (self.initizalized == None), 'model has already been built.'
         self.build_generator()
         self.build_discriminator()
