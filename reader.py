@@ -48,3 +48,36 @@ def read_dataset(filePath, batchSize):
 
 
 read_dataset('data/inData/captionsTrain.tsv', 1)
+
+
+## LANDONS CODE ##
+import re
+class ParseError(Exception):
+    """ Exception for errors while parsing a link """
+    pass
+
+
+# matcher for url denoted by https:// or http://
+urlString = r'https://\S+|http://\S+'
+urlMatcher = re.compile(urlString)
+
+
+def parsable(url):
+    """ Returns true if url follows urlMatcher pattern """
+    return True if urlMatcher.fullmatch(url) else False
+
+
+def fix_url(url, rootURL):
+    """ Add proper headings URLs for crawler analysis """
+    urlString = str(url)
+    if not parsable(urlString):
+        if urlString.startswith('http'):
+            pass
+        elif urlString.startswith("www"):
+            urlString = "https://" + urlString
+        elif urlString.startswith('/'):
+            urlString = rootURL + urlString
+            print(urlString, rootURL)
+        else:
+            urlString = "http://www." + urlString
+    return urlString

@@ -64,3 +64,4 @@ class Image_Generator():
         embeddingDim dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
+        inputs = 
