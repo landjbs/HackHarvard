@@ -7,6 +7,7 @@ pair is taught to capture the important details of an input text and to use
 them to construct and image that is both realistic and topical.
 """
 
+import numpy as np
 from keras.models import Model, Sequential, load_model
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
@@ -354,6 +355,7 @@ class Image_Generator():
         u.assert_pos('batchSize', batchSize)
 
         fileList = [f'{file}' for file in os.listdir(folderPath)]
+        fileNum = len(fileList)
 
         def make_discriminator_batch(captions, images):
             """
@@ -381,6 +383,14 @@ class Image_Generator():
             generator improvement
             """
             pass
+
+        for i in range(iter):
+            # load array of current batch
+            batchArray = np.load(fileList[(i % fileNum)])
+            # pull caption encodings from batchArray
+            # TODO:
+            # make batches for each model from batchArray
+            
 
 
 
