@@ -3,19 +3,24 @@ Reads image/caption pairs from coco dataset, encoding captions and images
 into sampleTensor.
 """
 
-from pycocotools.coco import COCO
-import numpy as np
-import skimage.io as io
-import matplotlib.pyplot as plt
-import pylab
+import json
 
-# import json
-#
-# with open('data/inData/annotations/stuff_train2017.json', 'r') as annoFile:
-#     data = json.load(annoFile)['annotations']
-#     for e in data:
-#         print(e['bbox'])
-#
+class CocoObs():
+    """ Class to store single observation from coco dataset """
+    
+    def __init__(self, )
 
-# pip3 install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
-# pip3 install Cython
+class CocoData():
+    """ Class to store observations from coco dataset """
+
+    def __init__(self, cocoPath):
+        self.cocoPath = cocoPath
+        self.idx = {}
+
+
+    def read_coco(cocoPath):
+        """ Reads captions and images from folders under coco path """
+        with open(f'{cocoPath}/annotations/captions_val2014.json', 'r') as annoFile:
+            data = json.load(cocoFile)
+            for elt in data['annotations']:
+                print(elt)
