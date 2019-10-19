@@ -402,7 +402,7 @@ class Image_Generator():
             # load array of current batch
             batchArray = np.load(fileList[(i % fileNum)])
             # pull caption encodings from batchArray
-            batchArray = decode_sample_tensor()
+            bertBatch, imBatch = decode_sample_tensor(batchArray)
             # make batches for each model from batchArray
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captions, images)
