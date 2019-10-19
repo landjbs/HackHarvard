@@ -390,7 +390,18 @@ class Image_Generator():
             # pull caption encodings from batchArray
             # TODO:
             # make batches for each model from batchArray
-            
+            (discriminatorX,
+            discriminatorY) = make_discriminator_batch(captions, images)
+            (describerX,
+            describerY) = make_describer_batch(captions, images)
+            (adversarialX,
+            adversarialY) = make_adversarial_batch(captions)
+            (creativeX,
+            creativeY) = make_creative_batch(captions, images)
+            # train each model on respective batch
+            discData = self.discriminatorModel.train_on_batch(discriminatorX,
+                                                            discriminatorY)
+
 
 
 
