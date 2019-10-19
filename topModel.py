@@ -70,5 +70,7 @@ class Image_Generator():
         EMBEDDING_DIM dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
-        # use 
-        inputs = Input(shape=sel.EMBEDDING_DIM, name='latent_embeddings')
+        # initialize generator with embedding vector from text
+        latent_embedding = Input(shape=self.EMBEDDING_DIM,
+                                name='latent_embedding')
+        # 
