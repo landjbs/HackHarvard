@@ -263,8 +263,7 @@ class Image_Generator():
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         describerModel = self.describerStruct
         describerModel.compile(optimizer=rmsOptimizer,
-                            loss=self.distance_loss(describerModel.layers[-1]),
-                            metrics=['accuracy'])
+                            loss=self.distance_loss(describerModel.layers[-1]))
         self.describerModel = describerModel
         return describerModel
 
@@ -295,7 +294,7 @@ class Image_Generator():
         creativeModel.add(self.generatorStruct)
         creativeModel.add(self.describerStruct)
         creativeModel.compile(optimizer=rmsOptimizer,
-                            loss=distance_loss(creativeModel.layers[-1]))
+                        loss=self.distance_loss(creativeModel.layers[-1]))
         self.creativeModel = creativeModel
         return creativeModel
 
@@ -307,7 +306,7 @@ class Image_Generator():
         self.compile_describer()
         self.compile_adversarial()
         self.compile_creative()
-        self.init = True
+        self.initizalized = True
         print(self.creativeModel.summary())
 
 
