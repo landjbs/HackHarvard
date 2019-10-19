@@ -86,7 +86,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             urlQueue.task_done()
             imgQueue.task_done()
             print(f'URLs Analyzed: {scrapeMetrics.count} | Errors: {errors}',
-                end='\r')
+                    end='\r')
 
     # spawn workerNum workers
     for _ in range(workerNum):
@@ -119,6 +119,11 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             for i in range(imgSize):
                 curArray = imgQueue.get()
                 imgTensor[i, :, :, :] = curArray
+            np.save(f'{outFolder}/imgTensor_{i}', imgTensor)
+
+    print(f'\n{"-"*80}Scraping Complete:\n\tAnalyzed: {scrapeMetrics.count}' \
+        f'Errors: {scrapeMetrics.errors}')
+    return True
 
 
 
