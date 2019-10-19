@@ -172,7 +172,6 @@ class Image_Generator():
         STRIDE = self.STRIDE
         LEAKY_ALPHA = self.LEAKY_ALPHA
 
-
         img_in = Input(shape=IMG_SHAPE, name='img_in')
         # first conv block
         conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
@@ -264,8 +263,8 @@ class Image_Generator():
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         describerModel = self.describerStruct
         describerModel.compile(optimizer=rmsOptimizer,
-                                loss=self.distance_loss(describerModel.layers[-1]),
-                                metrics=['accuracy'])
+                            loss=self.distance_loss(describerModel.layers[-1]),
+                            metrics=['accuracy'])
         self.describerModel = describerModel
         return describerModel
 
