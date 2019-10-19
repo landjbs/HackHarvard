@@ -57,11 +57,17 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
             # pop top url from queue
             cleanCaption, cleanUrl = urlQueue.get()
             try:
-                captionEmbedding = bc.encode([cleanCaption])[0]
+                # fetch cls token of caption from bert server
+                capVec = bc.encode([cleanCaption])[0]
+                # fetch raw image array from url
                 rawIm = np.array(bytearray(ur.urlopen(cleanUrl, timeout=0.5)),
                                 dtype=np.uint8)
+                # decode im array
                 rawIm = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
+                # filter and resize image
                 imArray = imageProcessing.filter_image(rawIm)
+                # encode caption vector and image array into single tensor
+                sampleTensor = imageProcessing.embed_bert(capVec, imArray)
             except:
                 scrapeMetrics.add(True)
                 urlQueue.task_done()
