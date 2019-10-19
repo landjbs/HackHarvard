@@ -8,6 +8,7 @@ them to construct and image that is both realistic and topical.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from keras.models import Model, Sequential, load_model
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
@@ -17,7 +18,7 @@ import keras.backend as K
 from keras.optimizers import RMSprop
 
 import utils as u
-from processing.image import decode_sample_tensor
+from processing.image import decode_batchArray
 
 
 class Image_Generator():
@@ -338,9 +339,28 @@ class Image_Generator():
 
     ## IMAGE MANIPULATION ##
     def image_from_textVec(self, textVec):
-        """ Uses generator model to generate image from BERT matrix """
-        return self.generatorStruct.predict(textVec)
+        """
+        Uses generator model to generate image from BERT matrix
+        testVec has size (m,1024)
+        """
+        sampleImages = self.generatorStruct.predict(textVec)
+        return sampleImages
 
+    def make_discriminator_batch(self, captions, images):
+        """
+        Makes discriminator batch from real images and generated images
+        Images must be (n,512,512,3)
+        """
+        fake_set = self.image_from_textVec(captions)
+        batch = np.concatenate((fake_set,images),axis=0)
+
+        num_fake = fake_set.shape[0]
+        num_real = images.shape[0]
+        answer_key = np.zeros(num_fake + num_real)
+        answer_key[num_fake:] = 1
+        print(answer_key)
+
+        return batch, answer_key
     ## TRAINING ##
     def train_models(self, folderPath, iter, batchSize, saveInt=500):
         """
@@ -368,8 +388,18 @@ class Image_Generator():
         def make_discriminator_batch(captions, images):
             """
             Makes discriminator batch from real images and generated images
+            Images must be (n,512,512,3)
             """
-            pass
+            fake_set = image_from_textVec(captions)
+            batch = np.concatenate(fake_set,images,axis=0)
+
+            num_fake = fake_set.shape[0]
+            num_real = images.shape[0]
+            answer_key = np.zeros(num_fake + num_real)
+            answer_key[num_fake:] = 1
+            print(answer_key)
+
+            return batch, answer_key
 
         def make_describer_batch(captions, images):
             """
@@ -394,13 +424,13 @@ class Image_Generator():
 
         def update_lr(lr,discL,discA, descL, advL,
                       advA, creativel, trainingRound):
-
+            pass
 
         for i in range(iter):
             # load array of current batch
             batchArray = np.load(fileList[(i % fileNum)])
             # pull caption encodings from batchArray
-            bertBatch, imBatch = decode_sample_tensor(batchArray)
+            bertBatch, imBatch = decode_batchArray(batchArray)
             # make batches for each model from batchArray
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captions, images)
@@ -437,7 +467,7 @@ class Image_Generator():
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
-            self.lr = update_lr(lr,discL,discA, descL, advL, 
+            self.lr = update_lr(lr,discL,discA, descL, advL,
                           advA, creativel, i)
 
             if (((i % saveInterval) == 0) and (i != 0)):
@@ -452,6 +482,10 @@ class Image_Generator():
 
 x = Image_Generator()
 x.initialize_models()
+fake_captions = np.random.uniform(size=(20,1024))
+fake_images = np.random.uniform(low=0,high=1,size=(20,512,512,3))
+print(x.make_discriminator_batch(fake_captions,fake_images)[0].shape)
+
 
 
 ## PLOTTTING BONES ##
