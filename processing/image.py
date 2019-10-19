@@ -18,5 +18,10 @@ def filter_image(imArray, outDim=256, upperBound=1024):
     else:
         raise InputError(f'Image has invalid dims {imShape}.')
 
-def embed_bert(bertVec, imArray):
-    """ Embeds bert caption vec in image array and returns single tenosr """
+def embed_bert(captionEmbedding, imArray):
+    """ Embeds bert caption vec in imArray and returns single tenosr """
+    imArray[:,-2,0] = captionEmbedding[:256]
+    imArray[:,-1,0] = captionEmbedding[256:512]
+    imArray[:,-2,1] = captionEmbedding[512:768]
+    imArray[:,-1,1] = captionEmbedding[768:]
+    return imArray
