@@ -54,7 +54,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
         while True:
             # pop top url from queue
             cleanCaption, cleanUrl = urlQueue.get()
-            print(f'Capt: {cleanCaption}\n URL {cleanUrl}')
             try:
                 captionEmbedding = bc.encode([cleanCaption])[0]
             except:
@@ -94,9 +93,11 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
             imArray[:,-1,0] = captionEmbedding[256:512]
             imArray[:,-2,1] = captionEmbedding[512:768]
             imArray[:,-1,1] = captionEmbedding[768:]
-            print(f'URLs Analyzed: {scrapeMetrics.count} | Errors: {errors}',
-                    end='\r')
 
+            # log and close task
+            scrapeMetrics.add(False)
+            print(f'URLs Analyzed: {scrapeMetrics.count} |'
+                f'Errors: {scrapeMetrics.errors}', end='\r')
             imgQueue.put(imArray)
             urlQueue.task_done()
             imgQueue.task_done()
@@ -144,11 +145,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                     imgTensor[i, :, :, :] = curArray
                     print(f'END: {i}')
                 np.save(f'{outFolder}/imgTensor_{lineCounter}', imgTensor)
-            else:
-                print(f'\n\n\n{imgSize}')
-                import time
-                time.sleep(100)
-            print(f'{"SAVED"*80}')
 
     print(f'\n{"-"*80}Scraping Complete:\n\tAnalyzed: {scrapeMetrics.count}' \
         f'Errors: {scrapeMetrics.errors}')
