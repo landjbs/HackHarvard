@@ -353,6 +353,8 @@ class Image_Generator():
 
 
 x = Image_Generator()
-print('ini')
-x.initialize_models()
-x.save('test')
+x.load('test')
+print(x)
+# print('ini')
+# x.initialize_models()
+# x.save('test')
