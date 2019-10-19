@@ -9,6 +9,7 @@ import re
 import cv2
 import urllib
 import numpy as np
+from tqdm import tqdm
 from queue import Queue
 from threading import Thread
 from bert_serving.client import BertClient
@@ -81,12 +82,13 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             imArray[:,-1,0] = captionEmbedding[256:512]
             imArray[:,-2,1] = captionEmbedding[512:768]
             imArray[:,-1,1] = captionEmbedding[768:]
+            print(f'URLs Analyzed: {scrapeMetrics.count} | Errors: {errors}',
+                    end='\r')
 
             imgQueue.put(imArray)
             urlQueue.task_done()
             imgQueue.task_done()
-            print(f'URLs Analyzed: {scrapeMetrics.count} | Errors: {errors}',
-                    end='\r')
+
 
     # spawn workerNum workers
     for _ in range(workerNum):
@@ -97,7 +99,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
     # iterate over data file
     with open(dataPath, 'r') as dataFile:
         # find number of lines in datafile
-        for lineMax, _ in enumerate(dataFile):
+        for lineMax, _ in tqdm(enumerate(dataFile)):
             pass
         dataFile.seek(0)
 
