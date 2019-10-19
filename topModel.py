@@ -2,6 +2,7 @@ from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape)
+from keras import (sqrt, sum, square)
 
 import utils as u
 
@@ -240,6 +241,19 @@ class Image_Generator():
         outputs = Dense(units=1024, activation='sigmoid', name='outputs')(flat)
 
         model = Model(inputs=img_in, outputs=outputs)
+
+        def distance_loss(layer):
+            def loss(real_vec, pseudo_vec):
+                return
+
+def custom_loss(layer):
+
+    # Create a loss function that adds the MSE loss to the mean of all squared activations of a specific layer
+    def loss(y_true,y_pred):
+        return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
+    return loss
+
+
 
         print(model.summary())
 
