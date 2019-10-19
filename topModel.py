@@ -2,7 +2,7 @@ from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape)
-from keras import (sqrt, sum, square)
+from keras import (sum, sqrt, square) as (kSum, kSqrt, kSquare)
 
 import utils as u
 
@@ -243,19 +243,15 @@ class Image_Generator():
         model = Model(inputs=img_in, outputs=outputs)
 
         def distance_loss(layer):
-            def loss(real_vec, pseudo_vec):
-                return
+            def loss(y_true,y_pred):
+                return kSqrt(kSum(kSquare(y_pred - y_true), axis=-1))
+            return loss
 
-def custom_loss(layer):
+        model.compile(optimizer='adam',
+              loss=distance_loss(outputs), # Call the loss function with the selected layer
+              metrics=['accuracy'])
 
-    # Create a loss function that adds the MSE loss to the mean of all squared activations of a specific layer
-    def loss(y_true,y_pred):
-        return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
-    return loss
-
-
-
-        print(model.summary())
+        print(model.summary())      
 
 
 
