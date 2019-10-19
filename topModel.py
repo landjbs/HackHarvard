@@ -155,7 +155,7 @@ class Image_Generator():
         relu_6 = ReLU(name='relu_6')(batch_6)
 
         model = Model(inputs=latent_embedding, outputs=relu_6)
-        self.generator = model
+        self.generatorStruct = model
         return True
 
     def build_discriminator(self):
@@ -201,7 +201,7 @@ class Image_Generator():
         flat = Flatten(name='flat')(drop_4)
         outputs = Dense(units=1, activation='sigmoid', name='outputs')(flat)
         model = Model(inputs=img_in, outputs=outputs)
-        self.discriminator =
+        self.discriminatorStruct = model
 
     def build_describer(self):
         """
@@ -245,24 +245,90 @@ class Image_Generator():
         outputs = Dense(units=1024, activation='sigmoid', name='outputs')(flat)
 
         model = Model(inputs=img_in, outputs=outputs)
+        self.describerStruct = model
+        return True
+
+    def compile_discriminator(self):
+        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        binaryLoss = 'binary_crossentropy'
+        discriminatorModel = self.discriminatorStructure
+        discriminatorModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
+                                metrics=['accuracy'])
+        self.discriminatorModel = discriminatorModel
+        return discriminatorModel
+
+    def compile_describer(self):
+        """ FINISH """
 
         def distance_loss(layer):
+            """ Custom loss for euclidean dist minimization """
             def loss(y_true,y_pred):
                 return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
             return loss
 
-        model.compile(optimizer='adam',
-              loss=distance_loss(outputs),
-              metrics=['accuracy'])
+        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        describerModel = self.describerStruct
+        describerModel.compile(optimizer=rmsOptimizer,
+                                loss=distance_loss(ouputs),
+                                metrics=['accuracy'])
+        self.describerModel = describerModel
+        return describerModel
 
-        print(model.summary())
+    def compile_adversarial(self):
+        """ FINSIH """
+        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        binaryLoss = 'binary_crossentropy'
+        # adversarial built by passing generator output through discriminator
+        adversarialModel = Sequential()
+        adversarialModel.add(self.generatorStruct)
+        adversarialModel.add(self.discriminatorStruct)
+        adversarialModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
+                                metrics=['accuracy'])
+        self.adversarialModel = adversarialModel
+        return adversarialModel
+
+def compile_adversarial(self, learningRate, decay, verbose=True):
+        """
+        Compiles generator model
+        Args:
+            learningRate (Opt):       Learning rate of RMSProp optimizer.
+            decay (Opt):              Decay of RMSProp optimizer.
+            verbose (Opt):            Whether to print model summary.
+        Returns:
+            Compiled adversarial model.
+        """
+        if self.adversarialCompiled:
+            raise self.ModelWarning('Adversarial has already been compiled.')
+        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        binaryLoss = 'binary_crossentropy'
+        # adversarial built by passing generator output through discriminator
+        adversarialModel = Sequential()
+        adversarialModel.add(self.generatorStructure)
+        adversarialModel.add(self.discriminatorStructure)
+        adversarialModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
+                                metrics=['accuracy'])
+        if verbose:
+            print(adversarialModel.summary())
+        self.adversarialCompiled = adversarialModel
+        return adversarialModel
 
 
 
 
 
 
+# self.discriminatorModel     = None
+# self.describerModel         = None
+# self.adversarialModel       = None
+# self.creativeModel          = None
 
+
+
+
+
+model.compile(optimizer='adam',
+      loss=distance_loss(outputs),
+      metrics=['accuracy'])
 
 
 
