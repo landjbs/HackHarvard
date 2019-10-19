@@ -58,9 +58,14 @@ class Image_Generator():
         # default momentum for adjusting mean and var in generator batch norm
         self.NORM_MOMENTUM      =   0.9
 
+    ## OBJECT UTILS ##
     def __str__(self):
         return (f'<Image_Generator Model | INIT={self.init} '
                 f'| ITER={self.curIter}>')
+
+    def save(self, path):
+        """ Saves Image_Generator() object to path """
+        u.assert_type('path', path, str)
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
     def distance_loss(layer):
@@ -81,12 +86,13 @@ class Image_Generator():
         # vector of cls
         cls_input = Input(shape=(self.EMBEDDING_DIM,), name='cls_input')
         # define structure of bidirectional lstm
-        lstm = Bidirectional(LSTM(units=self.EMBEDDING_DIM, activation='relu',
-                                    return_state=True))
+        lstm = LSTM(units=self.EMBEDDING_DIM, activation='relu',
+                                return_state=True)
         # get outputs of lstm run over word_inputs with cls initial state
-        lstm_out, hidden, cell = lstm(word_inputs, initial_state=cls_input)
+        lstm_out, hidden, cell = lstm(word_inputs, initial_state=[cls_input, cls_input])
         summarizerStructure = Model(inputs=[cls_input, word_inputs],
                                     outputs=cell)
+        print(summarizerStructure.summary())
 
     def build_generator(self):
         """
@@ -307,13 +313,18 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, ):
+    def train_models(self, folderPath):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
         generation.
+        Args:
+            folderPath:         Path to the folder of np arrays on which to train
+            iter:               Number of iterations for which to train
         """
-        pass
+
+
+
 
 
 
