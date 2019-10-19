@@ -58,35 +58,11 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
             cleanCaption, cleanUrl = urlQueue.get()
             try:
                 captionEmbedding = bc.encode([cleanCaption])[0]
+                rawIm = np.array(bytearray(ur.urlopen(cleanUrl, timeout=0.5)),
+                                dtype=np.uint8)
+                rawIm = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
+                imArray = imageProcessing.filter_image(rawIm)
             except:
-                scrapeMetrics.add(True)
-                urlQueue.task_done()
-                continue
-
-            try:
-                url_response = ur.urlopen(cleanUrl, timeout=0.5)
-                imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
-                imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
-            except:
-                scrapeMetrics.add(True)
-                urlQueue.task_done()
-                continue
-            if imArray is None:
-                scrapeMetrics.add(True)
-                urlQueue.task_done()
-                continue
-            if 256 <= imArray.shape[0] <= 1024:
-                if 258 <= imArray.shape[1] <= 1024:
-                    # print("cropping")
-                    hOffset = int((imArray.shape[0] - 256)/2)
-                    wOffset = int((imArray.shape[1] - 258)/2)
-                    imArray = imArray[hOffset:hOffset + 256,
-                                    wOffset:wOffset + 258,:]
-                else:
-                    scrapeMetrics.add(True)
-                    urlQueue.task_done()
-                    continue
-            else:
                 scrapeMetrics.add(True)
                 urlQueue.task_done()
                 continue
