@@ -16,11 +16,7 @@ class Image_Generator():
 
     def __init__(self, rowNum, colNum, maxTextLen):
         # assertions
-        u.assert_type('rowNum', rowNum, int)
-        u.assert_type('colNum', colNum, int)
         u.assert_type('maxTextLen', maxTextLen, int)
-        u.assert_pos('rowNum', rowNum)
-        u.assert_pos('colNum', colNum)
         u.assert_pos('maxTextLen', maxTextLen)
         ## text specs ##
         self.maxTextLen    = maxTextLen
@@ -284,12 +280,6 @@ class Image_Generator():
         """ to do """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
 
-        def distance_loss(layer):
-            """ Custom loss for euclidean dist minimization """
-            def loss(y_true,y_pred):
-                return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
-            return loss
-
         creativeModel = Sequential()
         creativeModel.add(self.generatorStruct)
         creativeModel.add(self.describerStruct)
@@ -307,7 +297,7 @@ class Image_Generator():
         self.compile_adversarial()
         self.compile_creative()
         self.initizalized = True
-        print(self.creativeModel.summary())
+        return True
 
 
 
