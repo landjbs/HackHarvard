@@ -20,7 +20,13 @@ from processing.cleaner import clean_text, clean_url
 
 bc = BertClient(check_length=True)
 
-
+def find_bert(imArray):
+    bert = np.zeros(1024)
+    bert[:256] = imArray[:,-2,0]
+    bert[256:512] = imArray[:,-1,0]
+    bert[512:768] = imArray[:,-2,1]
+    bert[768:] = imArray[:,-1,1]
+    return bert
 
 class Metrics():
     """ Class to keep track of scrape progress """
@@ -71,6 +77,11 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     scrapeMetrics.add(True)
             else:
                 scrapeMetrics.add(True)
+<<<<<<< HEAD
+=======
+            scrapeMetrics.add(False)
+            return imArray
+>>>>>>> 1d028c2da341b0bf3054efe016ea00adbe46e9ad
 
             imArray[:,-2,0] = captionEmbedding[:256]
             imArray[:,-1,0] = captionEmbedding[256:512]
@@ -80,8 +91,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             imgQueue.put(imArray)
             urlQueue.task_done()
             imgQueue.task_done()
-            print(f'URLs Analyzed: {scrapeMetrics.count} | Errors: {errors}',
-                    end='\r')
 
     # spawn workerNum workers
     for _ in range(workerNum):
@@ -114,11 +123,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             for i in range(imgSize):
                 curArray = imgQueue.get()
                 imgTensor[i, :, :, :] = curArray
-            np.save(f'{outFolder}/imgTensor_{i}', imgTensor)
-
-    print(f'\n{"-"*80}Scraping Complete:\n\tAnalyzed: {scrapeMetrics.count}' \
-        f'Errors: {scrapeMetrics.errors}')
-    return True
 
 
 
