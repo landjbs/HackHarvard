@@ -25,3 +25,14 @@ def embed_bert(captionEmbedding, imArray):
     imArray[:,-2,1] = captionEmbedding[512:768]
     imArray[:,-1,1] = captionEmbedding[768:]
     return imArray
+
+
+def decode_sample_tensor(sampleTensor):
+    """ Decodes tensor of caption vector and image array """
+    bert = np.zeros((sampleTensor.shape[0], 1024))
+    for i in range(sampleTensor.shape[0]):
+        bert[i,:256] = sampleTensor[i,:,-2,0]
+        bert[i,256:512] = sampleTensor[i,:,-1,0]
+        bert[i,512:768] = sampleTensor[i,:,-2,1]
+        bert[i,768:] = sampleTensor[i,:,-1,1]
+    return bert, sampleTensor[:,:,:-2,:]

@@ -1,8 +1,6 @@
 """
-Responsible for building database of page data from list of URLs.
-Outsources URL processing to urlAnalyzer.py
-Outsources HTML processing to htmlAnalyzer.py
-Outsoucres database definitions to thicctable.py
+Reads caption data from google conceptual captions dataset. Uses multithreading
+and url access to fetch images and encode as tensors saved under outPath.
 """
 
 import re
@@ -19,15 +17,6 @@ import processing.text as textProcessing
 import processing.image as imageProcessing
 
 bc = BertClient(check_length=True)
-
-def find_bert(BigArray):
-    bert = np.zeros((imArray.shape[0], 1024))
-    for i in range(imArray.shape[0]):
-        bert[i,:256] = imArray[i,:,-2,0]
-        bert[i,256:512] = imArray[i,:,-1,0]
-        bert[i,512:768] = imArray[i,:,-2,1]
-        bert[i,768:] = imArray[i,:,-1,1]
-    return bert, imArray[:,:,:-2,:]
 
 class Metrics():
     """ Class to keep track of scrape progress """
@@ -80,11 +69,13 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                 imgQueue.put(imArray)
                 urlQueue.task_done()
                 imgQueue.task_done()
+
     # spawn workerNum workers
     for _ in range(workerNum):
         t = Thread(target=worker)
         t.daemon = True
         t.start()
+
     # iterate over data file to count line num
     with open(dataPath, 'r') as dataFile:
         # find number of lines in datafile
