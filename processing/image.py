@@ -2,6 +2,7 @@
 Utils for cleaning and processing all images encountered by models.
 """
 
+import numpy as np
 
 def filter_image(imArray, outDim=256, upperBound=1024):
     """
