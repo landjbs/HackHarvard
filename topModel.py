@@ -200,8 +200,52 @@ class Image_Generator():
 
     def build_describer(self):
         """
-        
         """
+        IMG_SHAPE = (512, 512, 3)
+        # rate of dropout
+        DROPOUT = self.DROPOUT
+        # size of kernel
+        KERNEL_SIZE = self.KERNEL_SIZE
+        # size of stride
+        STRIDE = self.STRIDE
+        LEAKY_ALPHA = self.LEAKY_ALPHA
+
+        img_in = Input(shape=IMG_SHAPE, name='img_in')
+        # first conv block
+        conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_1')(img_in)
+        relu_1 = LeakyReLU(LEAKY_ALPHA, name=f'relu_1')(conv_1)
+        drop_1 = Dropout(rate=DROPOUT, name=f'drop_1')(relu_1)
+
+        # second conv block
+        conv_2 = Conv2D(filters=32, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_2')(drop_1)
+        relu_2 = LeakyReLU(LEAKY_ALPHA, name=f'relu_2')(conv_2)
+        drop_2 = Dropout(rate=DROPOUT, name=f'drop_2')(relu_2)
+
+        # third conv block
+        conv_3 = Conv2D(filters=64, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_3')(drop_2)
+        relu_3 = LeakyReLU(LEAKY_ALPHA, name=f'relu_3')(conv_3)
+        drop_3 = Dropout(rate=DROPOUT, name=f'drop_3')(relu_3)
+
+        # fourth conv block
+        conv_4 = Conv2D(filters=128, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_4')(drop_3)
+        relu_4 = LeakyReLU(LEAKY_ALPHA, name=f'relu_4')(conv_4)
+        drop_4 = Dropout(rate=DROPOUT, name=f'drop_4')(relu_4)
+
+        # dense network
+        flat = Flatten(name='flat')(drop_4)
+        outputs = Dense(units=1024, activation='sigmoid', name='outputs')(flat)
+
+        model = Model(inputs=img_in, outputs=outputs)
+
+        print(model.summary())
+
+
+
+
 
 
 
@@ -209,4 +253,4 @@ class Image_Generator():
 
 
 x = Image_Generator(1,1,1)
-x.build_discriminator()
+x.build_describer()
