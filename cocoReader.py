@@ -43,7 +43,6 @@ class CocoData():
                         break
                     imgId = example['image_id']
                     imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
-                    print(imArray.shape, end='\n\n')
                     yield (example['id'], example['caption'], imArray)
 
         if cocoPath:
@@ -51,6 +50,12 @@ class CocoData():
                             in tqdm(enumerate(coco_reader(cocoPath)))}
         else:
             self.trainIdx = None
+
+    def __str__(self):
+        if self.trainIdx != None:
+            return f'<CocoData Obj | TRAIN_NUM={len(self.trainIdx)}>'
+        else:
+            return f'<CocoData Obj | UNINITIALIZED>'
 
     def save(self, path):
         """ Saves to path """
@@ -66,6 +71,3 @@ class CocoData():
 x = CocoData('data/inData/coco2014')
 print(x.trainIdx)
 x.save('test')
-del x
-x = CocoData()
-x.load('test')
