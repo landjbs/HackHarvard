@@ -39,34 +39,6 @@ def url_to_nice_array(cleanedURL):
         return None
     return imArray
 
-    # try:
-    #     imgFetch = requests.get(cleanedURL, headers={'User-Agent': 'Custom'}, stream=True, timeout=0.1)
-    # except:
-    #     return None
-    #
-    # path = f"data/inData/batchImg{str(count)}.jpg"
-    # with open(path, 'wb') as f:
-    #     imgFetch.raw.decode_content = True
-    #     # imgArray = PIL2array(imgFetch.raw)
-    #     try:
-    #         shutil.copyfileobj(imgFetch.raw, f)
-    #     except:
-    #         return None
-    #
-    # imArray = cv2.imread(path)
-    # if imArray is not None:
-    #     imArray = imArray[:,:,::-1]
-    # else:
-    #     return None
-    # if 512 <= imArray.shape[0] <= 1024:
-    #     if 512 <= imArray.shape[1] <= 1024:
-    #         hOffset = int((imArray.shape[0] - 512)/2)
-    #         wOffset = int((imArray.shape[1] - 512)/2)
-    #         imArray = imArray[hOffset:hOffset + 512, wOffset:wOffset + 512,:]
-    #     else:
-    #         return None
-    # else:
-    #     return None
 
 def scrape_urlList(urlList, runTime=100000000, queueDepth=1000000, workerNum=2):
     """
@@ -104,17 +76,9 @@ def scrape_urlList(urlList, runTime=100000000, queueDepth=1000000, workerNum=2):
 
             try:
                 imArray = url_to_array(cleanedURL)
-
             except:
                 imgQueue.task_done()
                 continue
-
-            # save progress every 10 items
-            if (len(testSimple.data) == 10):
-                # testSimple.save(f"data/thicctable/{str(scrapeMetrics.count)}")
-                save(testSimple.data, f'data/thicctable/{str(scrapeMetrics.count + 345)}')
-                testSimple.clear()
-                pass
 
             # log progress
             print(f"\tURLs ANALYZED: {scrapeMetrics.count} | Errors: {scrapeMetrics.errors} | Queue Size: {urlQueue.qsize()}", end="\r")
