@@ -52,3 +52,10 @@ def safe_make_folder(folderPath):
             safe_make_folder(folderPath)
     else:
         os.mkdir(folderPath)
+
+
+## ASSERTIONS ##
+def assert_type(name, obj, t):
+    """ Asserts obj has type t """
+    assert isinstance(obj, t), (f'{name} expected type {t}, but found type '
+                                f'{type(obj)}')
