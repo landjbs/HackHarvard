@@ -24,12 +24,9 @@ class Image_Generator():
     describer.
     """
 
-    def __init__(self, maxTextLen):
-        # assertions
-        u.assert_type('maxTextLen', maxTextLen, int)
-        u.assert_pos('maxTextLen', maxTextLen)
+    def __init__(self):
         ## text specs ##
-        self.maxTextLen     = maxTextLen
+        self.MAX_TEXT_LEN     = 20
         self.EMBEDDING_DIM  = 1024
         ## image specs ##
         self.IMG_SHAPE = (512, 512, 3)
@@ -68,6 +65,15 @@ class Image_Generator():
         u.assert_type('path', path, str)
         u.safe_make_folder(path)
         assert self.initizalized, 'models must be initialized before saving.'
+        self.summarizerStruct.save(f'{path}/summarizerStruct.h5')
+        self.generatorStruct.save(f'{path}/generatorStruct.h5')
+        self.discriminatorStruct.save(f'{path}/discriminatorStruct.h5')
+        self.describerStruct.save(f'{path}/describerStruct.h5')
+        self.discriminatorModel.save(f'{path}/discriminatorModel.h5')
+        self.describerModel.save(f'{path}/describerModel.h5')
+        self.adversarialModel.save(f'{path}/adversarialModel.h5')
+        self.creativeModel.save(f'{path}/creativeModel.h5')
+
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
     def distance_loss(layer):
@@ -83,7 +89,7 @@ class Image_Generator():
         EMBEDDING_DIM dimensions.
         """
         # matix of word encodings
-        word_inputs = Input(shape=(self.EMBEDDING_DIM, self.maxTextLen),
+        word_inputs = Input(shape=(self.EMBEDDING_DIM, self.MAX_TEXT_LEN),
                             name='word_encodings')
         # vector of cls
         cls_input = Input(shape=(self.EMBEDDING_DIM,), name='cls_input')
