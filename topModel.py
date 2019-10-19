@@ -401,6 +401,13 @@ class Image_Generator():
             # train each model on respective batch
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
+            descData = self.describerModel.train_on_batch(describerX,
+                                                        describerY)
+            advData = self.adversarialModel.train_on_batch(adversarialX,
+                                                            adversarialY)
+            creativeData = self.creativeModel.train_on_batch(creativeX,
+                                                            creativeY)
+            # round and log
 
 
 
