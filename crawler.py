@@ -101,20 +101,18 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
             imgQueue.put(imArray)
             urlQueue.task_done()
             imgQueue.task_done()
-
     # spawn workerNum workers
     for _ in range(workerNum):
         t = Thread(target=worker)
         t.daemon = True
         t.start()
-
-    # iterate over data file
+    # iterate over data file to count line num
     with open(dataPath, 'r') as dataFile:
         # find number of lines in datafile
         for lineMax, _ in enumerate(dataFile):
             pass
         dataFile.seek(0)
-
+        # iterate over entire file
         while lineCounter < lineMax:
             littleIter = 0
             for line in dataFile:
@@ -130,20 +128,16 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                 cleanUrl = clean_url(lineSplit[0])
                 sampleTuple = (cleanCaption, cleanUrl)
                 urlQueue.put(sampleTuple)
+                print(f'\t\t{lineCounter}', end='\r')
                 lineCounter += 1
                 littleIter += 1
             # convert img queue into single numpy array
             imgSize = imgQueue.qsize()
             if imgSize > 0:
-                print("IMG")
                 imgTensor = np.zeros(shape=(imgSize, 256, 258, 3))
                 for i in range(imgSize):
-                    print(f'START: {i}')
                     curArray = imgQueue.get()
-                    print(curArray)
-                    print(imgQueue.qsize())
                     imgTensor[i, :, :, :] = curArray
-                    print(f'END: {i}')
                 np.save(f'{outFolder}/imgTensor_{lineCounter}', imgTensor)
 
     print(f'\n{"-"*80}Scraping Complete:\n\tAnalyzed: {scrapeMetrics.count}' \
@@ -151,4 +145,4 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
     return True
 
 
-process_caption_data('data/inData/captionsTrain.tsv', 'data/outData/trainArrays', queueDepth=10, workerNum=1)
+process_caption_data('data/inData/captionsTrain.tsv', 'data/outData/trainArrays', queueDepth=100, workerNum=1)
