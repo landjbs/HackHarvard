@@ -4,6 +4,7 @@ Utils for cleaning and processing all images encountered by models.
 
 import numpy as np
 
+
 def filter_image(imArray, outDim=256, upperBound=1024):
     """
     Filters imArray to outDim, filtering those with dimensions
@@ -18,6 +19,7 @@ def filter_image(imArray, outDim=256, upperBound=1024):
                             wOffset:wOffset + outDim, :]
     else:
         raise InputError(f'Image has invalid dims {imShape}.')
+
 
 def embed_bert(captionEmbedding, imArray):
     """ Embeds bert caption vec in imArray and returns single tenosr """

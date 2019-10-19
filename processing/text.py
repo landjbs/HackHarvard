@@ -5,11 +5,11 @@ Utils for cleaning and processing all text encountered by models.
 import re
 secureMatcher = re.compile(r"https")
 
+
 # matches non-alphanumeric, space, or sentence-ending punctuation (dash must be at end)
 stripMatcher = re.compile(r'[^0-9a-zA-Z\t\n\s_.?!:;/<>*&^%$#@()"~`+-]')
 # matches any sequence of tabs, newlines, spaces, underscores, and dashes
 spaceMatcher = re.compile(r'[\t\n\s_.?!:;/<>*&^%$#@()"~`+-]+')
-
 
 
 ## Functions ##
