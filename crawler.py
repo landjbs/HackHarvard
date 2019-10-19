@@ -60,7 +60,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             except:
                 scrapeMetrics.add(True)
             if imArray is None:
-                return None
+                scrapeMetrics.add(True)
             if 256 <= imArray.shape[0] <= 1024:
                 if 258 <= imArray.shape[1] <= 1024:
                     # print("cropping")
@@ -71,9 +71,19 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     scrapeMetrics.add(True)
             else:
                 scrapeMetrics.add(True)
+<<<<<<< HEAD
             scrapeMetrics.add(False)
             return imArray
+=======
+>>>>>>> 3faca056ff3fad0d3dc2a9335259de9eef8cbca0
 
+            imArray[:,-2,0] = captionEmbedding[:256]
+            imArray[:,-1,0] = captionEmbedding[256:512]
+            imArray[:,-2,1] = captionEmbedding[512:768]
+            imArray[:,-1,1] = captionEmbedding[768:]
+
+            imgQueue.put(imArray)
+            urlQueue.task_done()
             imgQueue.task_done()
 
     # spawn workerNum workers
