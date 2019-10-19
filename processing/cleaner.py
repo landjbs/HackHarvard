@@ -8,6 +8,7 @@ Functions:
 
 import re
 from unidecode import unidecode
+secureMatcher = re.compile(r"https")
 
 # matches non-alphanumeric, space, or sentence-ending punctuation (dash must be at end)
 stripMatcher = re.compile(r'[^0-9a-zA-Z\t\n\s_.?!:;/<>*&^%$#@()"~`+-]')
@@ -31,3 +32,7 @@ def clean_text(rawString):
     # lowercase the alpha chars that remain
     loweredString = spacedString.lower()
     return loweredString
+
+def clean_url(rawUrl):
+    """ Cleans url by replacing https with http """
+    return re.sub(secureMatcher, "http", rawUrl.strip("\n").lower())

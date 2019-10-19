@@ -10,7 +10,7 @@ import requests
 import shutil
 import numpy as np
 import cv2
-
+from processing import cleaner
 from crawler import url_to_nice_array
 # response = requests.get(url)
 # img = Image.open(BytesIO(response.content))

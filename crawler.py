@@ -14,6 +14,39 @@ import shutil
 import numpy as np
 import cv2
 import urllib
+import utils as u
+from bert_serving.client import BertClient
+from processing.cleaner import clean_text, clean_url
+
+bc = BertClient(check_length=True)
+
+def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
+    """ """
+    u.safe_make_folder(outFolder)
+
+    urlQueue = Queue(maxsize=10000)
+
+    # spawn workerNum workers
+    for _ in range(workerNum):
+        t = Thread(target=worker)
+        t.daemon = True
+        t.start()
+
+    # iterate over data file
+    with open(dataPath, 'r') as dataFile:
+        for i, line in enumerate(dataFile):
+            lineSplit = re.split('\t', line)
+            assert (len(lineSplit)==2), ('line expected length 2, but found '
+                                        f'length {len(lineSplit)}')
+            caption = lineSplit.pop(0)
+            cleanCaption = clean_text(caption)
+            cleanedURL = clean_url(lineSplit[0])
+
+
+
+
+
+
 
 def url_to_nice_array(cleanedURL):
     try:
