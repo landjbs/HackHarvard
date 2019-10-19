@@ -130,10 +130,10 @@ class Image_Generator():
         ## FOURTH UPSAMPLING BLOCK ##
         upsample_4 = UpSampling2D(name='upsample_4')(relu_3)
         transpose_4 = Conv2DTranspose(filters=512, kernel_size=KERNEL_SIZE,
-                                    padding='same', strides=STRIDE)(upsample_3)
+                                    padding='same', strides=STRIDE)(upsample_4)
         batch_4 = BatchNormalization(momentum=NORM_MOMENTUM,
-                                    name='batch_3')(transpose_3)
-        relu_4 = ReLU(name='relu_3')(batch_3)
+                                    name='batch_4')(transpose_4)
+        relu_4 = ReLU(name='relu_4')(batch_4)
 
 
 
