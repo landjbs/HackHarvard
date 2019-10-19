@@ -35,7 +35,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
 
             try:
                 # print(cleanedURL)
-                url_response = urllib.request.urlopen(cleanedURL,timeout=0.5)
+                url_response = urllib.request.urlopen(cleanUrl,timeout=0.5)
                 # print("accessed website")
                 imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
                 imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
