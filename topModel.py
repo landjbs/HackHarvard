@@ -74,7 +74,7 @@ class Image_Generator():
         # number of nodes for dense network at latent stage
         DENSE_NODES     = (8 * 8 * self.EMBEDDING_DIM)
         # shape of reshaped latent dimensional vec
-        LATENT_IMAGE_SHAPE = (32, 32)
+        LATENT_IMAGE_SHAPE = (8, 8, self.EMBEDDING_DIM)
         # momentum of batch norm
         NORM_MOMENTUM   = self.NORM_MOMENTUM
         # rate of dropout
@@ -86,7 +86,7 @@ class Image_Generator():
 
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
-        latent_embedding = Input(shape=self.EMBEDDING_DIM,
+        latent_embedding = Input(shape=(self.EMBEDDING_DIM, ),
                                 name='latent_embedding')
         # run dense net over latent vector
         latent_dense = Dense(units=DENSE_NODES,
@@ -104,35 +104,53 @@ class Image_Generator():
                                 name='latent_dropout')(latent_reshape)
 
         ## FIRST UPSAMPLING BLOCK ##
-        upsample_1 = UpSampling2D(name='upsample_1')(latent_dropout)
-        transpose_1 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
-                                    padding='same', strides=STRIDE)(upsample_1)
+        transpose_1 = Conv2DTranspose(filters=256, kernel_size=KERNEL_SIZE,
+                                    padding='same',
+                                    strides=STRIDE)(latent_dropout)
         batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_1')(transpose_1)
         relu_1 = ReLU(name='relu_1')(batch_1)
 
         ## SECOND UPSAMPLING BLOCK ##
-        upsample_2 = UpSampling2D(name='upsample_2')(relu_1)
-        transpose_2 = Conv2DTranspose(filters=128, kernel_size=KERNEL_SIZE,
-                                    padding='same', strides=STRIDE)(upsample_2)
+        transpose_2 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(relu_1)
         batch_2 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_2')(transpose_2)
         relu_2 = ReLU(name='relu_2')(batch_2)
 
         ## THIRD UPSAMPLING BLOCK ##
-        upsample_3 = UpSampling2D(name='upsample_3')(relu_2)
-        transpose_3 = Conv2DTranspose(filters=256, kernel_size=KERNEL_SIZE,
-                                    padding='same', strides=STRIDE)(upsample_3)
+        transpose_3 = Conv2DTranspose(filters=16, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(relu_2)
         batch_3 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_3')(transpose_3)
         relu_3 = ReLU(name='relu_3')(batch_3)
 
         ## FOURTH UPSAMPLING BLOCK ##
-        upsample_4 = UpSampling2D(name='upsample_4')(relu_3)
-        transpose_4 = Conv2DTranspose(filters=512, kernel_size=KERNEL_SIZE,
-                                    padding='same', strides=STRIDE)(upsample_4)
+        transpose_4 = Conv2DTranspose(filters=8, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(relu_3)
         batch_4 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_4')(transpose_4)
         relu_4 = ReLU(name='relu_4')(batch_4)
 
         ## FIFTH UPSAMPLING BLOCK ##
+        transpose_5 = Conv2DTranspose(filters=8, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(relu_4)
+        batch_5 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_5')(transpose_5)
+        relu_5 = ReLU(name='relu_5')(batch_5)
+
+        ## SIXTH UPSAMPLING BLOCK ##
+        transpose_6 = Conv2DTranspose(filters=3, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(relu_5)
+        batch_6 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_6')(transpose_6)
+        relu_6 = ReLU(name='relu_6')(batch_6)
+
+        model = Model(inputs=latent_embedding, outputs=relu_6)
+
+
+        print(model.summary())
+
+
+x = Image_Generator(1,1,1)
+x.build_generator()
