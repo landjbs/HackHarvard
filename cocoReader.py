@@ -45,14 +45,16 @@ class CocoData():
 
                     imgId = example['image_id']
                     captionText = text.clean_text(example['caption'])
-                    imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
-                    print(imArray.shape)
+                    imArray = load_and_filter_image(f"{imageFolder}/{imIdx[imgId]}")
+                    assert imArray.shape == (512, 512, 3), f'{imArray.shape}'
+                    # imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
                     # encode caption and clean image
                     try:
                         captionVec = text.text_to_cls(captionText)
                         cleanedIm = image.filter_image(imArray, outDim=480)
-                        yield (captionText, captionVec, imArray)
+                        yield (captionText, captionVec, cleanIm)
                     except Exception as e:
+                        print(f'ERROR: {e}')
                         yield None
 
         if cocoPath:
@@ -68,7 +70,7 @@ class CocoData():
 
     def __str__(self):
         if self.trainIdx != None:
-            return f'<CocoData Obj | TRAIN_NUM={len(self.indexSize)}>'
+            return f'<CocoData Obj | TRAIN_NUM={self.indexSize}>'
 
     def save(self, path):
         """ Saves to path """
@@ -80,6 +82,7 @@ class CocoData():
         u.assert_type('path', path, str)
         assert u.os.path.exists(path), f'path "{path}" not found.'
         self.trainIdx = u.load(f'{path}/trainIdx.sav')
+        self.indexSize = len(self.trainIdx)
 
     def fetch_batch(batchSize):
         """ Fetches random batch of batchSize from trainIdx """
@@ -87,11 +90,9 @@ class CocoData():
 
 
 coco = CocoData('data/inData/coco2014')
-print(coco.trainIdx)
 for elt in coco.trainIdx.values():
     im = elt[2]
-    print(im.shape)
-    plt.imshow(elt)
-    plt.title(captionText)
+    plt.imshow(im)
+    plt.title(elt[0])
     plt.show()
 coco.save('CocoData')

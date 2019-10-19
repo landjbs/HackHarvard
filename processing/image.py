@@ -3,9 +3,15 @@ Utils for cleaning and processing all images encountered by models.
 """
 
 import numpy as np
+from wand.img import Image
 
 # LANDON BERT
 # bert-serving-start -model_dir /Users/landon/Desktop/bertLarge -num_worker=3
+
+def load_and_filter_image(imPath, ):
+    with Image(imPath) as img:
+        return np.array(img.liquid_rescale(512, 512))
+
 
 def filter_image(imArray, outDim, upperBound=1024):
     """
@@ -14,7 +20,7 @@ def filter_image(imArray, outDim, upperBound=1024):
     """
     imShape = imArray.shape
     if ((outDim <= imShape[0] <= upperBound)
-    and ((outDim + 2) <= imShape[1] <= upperBound)):
+        and (outDim <= imShape[1] <= upperBound)):
         hOffset = int((imShape[0] - outDim)/2)
         wOffset = int((imShape[1] - outDim)/2)
         imArray = imArray[hOffset:hOffset + outDim, wOffset:wOffset + outDim, :]
