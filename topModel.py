@@ -44,7 +44,7 @@ class Image_Generator():
         # default kernel size
         self.KERNEL_SIZE        =   [5, 5]
         # default convolution stride length
-        self.STRIDE             =   2
+        self.STRIDE             =   [2, 2]
         # default alpha of LeakyReLU activation in discriminator
         self.LEAKY_ALPHA        =   0.2
         # dimensions of generator latent space
@@ -81,6 +81,8 @@ class Image_Generator():
         DROPOUT = self.DROPOUT
         # size of kernel
         KERNEL_SIZE = self.KERNEL_SIZE
+        # size of stride
+        STRIDE = self.STRIDE
 
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
@@ -104,7 +106,7 @@ class Image_Generator():
         ## FIRST UPSAMPLING BLOCK ##
         upsample_1 = UpSampling2D(name='upsample_1')(latent_dropout)
         transpose_1 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
-                                    padding='same')(upsample_1)
+                                    padding='same', strides=STRIDE)(upsample_1)
         batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_1')(transpose_1)
         relu_1 = ReLU(name='relu_1')(batch_1)
@@ -112,10 +114,20 @@ class Image_Generator():
         ## SECOND UPSAMPLING BLOCK ##
         upsample_2 = UpSampling2D(name='upsample_2')(relu_1)
         transpose_2 = Conv2DTranspose(filters=128, kernel_size=KERNEL_SIZE,
-                                    padding='same')(upsample_2)
+                                    padding='same', strides=STRIDE)(upsample_2)
         batch_2 = BatchNormalization(momentum=NORM_MOMENTUM,
                                     name='batch_2')(transpose_2)
         relu_2 = ReLU(name='relu_2')(batch_2)
+
+        ## THIRD UPSAMPLING BLOCK ##
+        upsample_3 = UpSampling2D(name='upsample_3')(relu_2)
+        transpose_3 = Conv2DTranspose(filters=128, kernel_size=KERNEL_SIZE,
+                                    padding='same', strides=STRIDE)(upsample_3)
+        batch_3 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_3')(transpose_3)
+        relu_3 = ReLU(name='relu_3')(batch_3)
+
+
 
 
 
