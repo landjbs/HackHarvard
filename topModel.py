@@ -23,7 +23,7 @@ class Image_Generator():
     describer.
     """
 
-    def __init__(self, rowNum, colNum, maxTextLen):
+    def __init__(self, maxTextLen):
         # assertions
         u.assert_type('maxTextLen', maxTextLen, int)
         u.assert_pos('maxTextLen', maxTextLen)
@@ -74,8 +74,18 @@ class Image_Generator():
         Builds and compiles summarizer model to read BERT matrix into vector of
         EMBEDDING_DIM dimensions.
         """
-        # TODO: IMP SUMMARIZER
-        pass
+        # matix of word encodings
+        word_inputs = Input(shape=(self.BERT_DIM, self.MAX_CAPTION_LEN),
+                            name='word_encodings')
+        # vector of cls
+        cls_input = Input(shape=(self.BERT_DIM, ), name='cls_input')
+        # define structure of bidirectional lstm
+        gru = Bidirectional(GRU(units=self.LATENT_DIM, activation='relu',
+                                    return_state=True))
+        # get outputs of lstm run over word_inputs with cls initial state
+        lstm_out, hidden, cell = gru(word_inputs, initial_state=cls_input)
+        summarizerStructure = Model(inputs=[cls_input, word_inputs],
+                                    outputs=cell)
 
     def build_generator(self):
         """
