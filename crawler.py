@@ -7,15 +7,16 @@ Outsoucres database definitions to thicctable.py
 
 import re
 import cv2
-import urllib.request as ur
 import numpy as np
 from tqdm import tqdm
 from queue import Queue
+import urllib.request as ur
 from threading import Thread
 from bert_serving.client import BertClient
 
 import utils as u
-from processing.cleaner import clean_text, clean_url
+import processing.text as textProcessing
+import processing.image as imageProcessing
 
 bc = BertClient(check_length=True)
 
@@ -39,10 +40,11 @@ class Metrics():
         if error:
             self.errors += 1
 
-
-
 def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
-    """ """
+    """
+    Code to process conceptual captions data by encoding caption text and
+    fetching images from url. Saves numpy batch files to outFolder.
+    """
     u.safe_make_folder(outFolder)
 
     scrapeMetrics = Metrics()
@@ -65,7 +67,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                 url_response = ur.urlopen(cleanUrl, timeout=0.5)
                 imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
                 imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
-            except Exception as e:
+            except:
                 scrapeMetrics.add(True)
                 urlQueue.task_done()
                 continue
@@ -124,8 +126,8 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                 assert (len(lineSplit)==2), ('line expected length 2, but found '
                                             f'length {len(lineSplit)}')
                 caption = lineSplit.pop(0)
-                cleanCaption = clean_text(caption)
-                cleanUrl = clean_url(lineSplit[0])
+                cleanCaption = textProcessing.clean_text(caption)
+                cleanUrl = textProcessing.clean_url(lineSplit[0])
                 sampleTuple = (cleanCaption, cleanUrl)
                 urlQueue.put(sampleTuple)
                 print(f'\t\t{lineCounter}', end='\r')
