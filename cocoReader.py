@@ -34,14 +34,12 @@ class CocoData():
             path_to_id = lambda path : int(re.findall(pathIdMatcher, path)[0])
             imIdx = {path_to_id(path) : path
                     for path in u.os.listdir(f'{cocoPath}/train2014')}
-
+            i = 0
             with open(captionPath, 'r') as captionFile:
                 captionData = json.load(captionFile)
                 capNum = len(captionData['annotations'])
-                i = 0
                 for example in tqdm(captionData['annotations'], total=capNum):
-                    i += 1
-
+                    i +=1
                     if i > 10:
                         break
 
@@ -52,10 +50,11 @@ class CocoData():
                     try:
                         captionVec = text.text_to_cls(captionText)
                         cleanedIm = image.filter_image(imArray)
-                        yield (captionVec, captionVec, imArray)
+                        yield (captionText, captionVec, imArray)
                     except:
+                        print('ERROR')
                         yield None
-                        
+
         if cocoPath:
             error_filter = lambda elt : elt != None
             trainIdx = {i : dataTup for i, dataTup
@@ -82,6 +81,12 @@ class CocoData():
         assert u.os.path.exists(path), f'path "{path}" not found.'
         self.trainIdx = u.load(f'{path}/trainIdx.sav')
 
-x = CocoData('data/inData/coco2014')
-print(x.trainIdx)
-x.save('test')
+coco = CocoData('data/inData/coco2014')
+print(coco.trainIdx)
+for elt in coco.trainIdx:
+    print(elt)
+    im = elt[2]
+    plt.imshow(elt)
+    plt.title(captionText)
+    plt.show()
+coco.save('CocoData')

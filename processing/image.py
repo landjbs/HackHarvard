@@ -17,6 +17,7 @@ def filter_image(imArray, outDim=256, upperBound=1024):
             wOffset = int((imShape[1] - outDim)/2)
             imArray = imArray[hOffset:hOffset + outDim,
                             wOffset:wOffset + outDim, :]
+        return (imArray / 255)
     else:
         raise InputError(f'Image has invalid dims {imShape}.')
 
