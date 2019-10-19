@@ -73,8 +73,12 @@ class Image_Generator():
         ## TRAINING PARAMS ##
         # number of nodes for dense network at latent stage
         DENSE_NODES     = 500
+        # shape of reshaped latent dimensional vec (sqrt(1024), sqrt(1024))
+        LATENT_IMAGE_SHAPE = (32, 32)
         # momentum of batch norm
         NORM_MOMENTUM   = self.NORM_MOMENTUM
+        # rate of dropout
+        DROPOUT = self.DROPOUT
 
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
@@ -88,5 +92,10 @@ class Image_Generator():
                                           name='batch_latent')(latent_dense)
         # relu activation over latent dense after batch norm
         latent_relu = ReLU(name='relu_latent')(latent_batch)
+        # reshape latent dimensions into picture size
+        latent_reshape = Reshape(target_shape=LATENT_IMAGE_SHAPE,
+                                name='latent_reshape')(latent_relu)
+        # run dropout over reshape latent image
+        latent_dropout = Dropout()
 
         ## FIRST UPSAMPLING ##
