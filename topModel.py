@@ -70,7 +70,23 @@ class Image_Generator():
         EMBEDDING_DIM dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
+        ## TRAINING PARAMS ##
+        # number of nodes for dense network at latent stage
+        DENSE_NODES     = 500
+        # momentum of batch norm
+        NORM_MOMENTUM   = self.NORM_MOMENTUM
+
+        ## LATENT STAGE ##
         # initialize generator with embedding vector from text
         latent_embedding = Input(shape=self.EMBEDDING_DIM,
                                 name='latent_embedding')
-        # 
+        # run dense net over latent vector
+        latent_dense = Dense(units=DENSE_NODES,
+                            name='latent_dense')(latent_embedding)
+        # batch norm latent dense
+        latent_batch = BatchNormalization(momentum=NORM_MOMENTUM,
+                                          name='batch_latent')(latent_dense)
+        # relu activation over latent dense after batch norm
+        latent_relu = ReLU(name='relu_latent')(latent_batch)
+
+        ## FIRST UPSAMPLING ##
