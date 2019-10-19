@@ -19,9 +19,9 @@ pathIdMatcher = re.compile(r'(?<=0)[1-9]\d*(?=.jpg)')
 
 class CocoData():
     """ Class to store observations from coco dataset """
-    def __init__(self, cocoPath):
-        assert isinstance(cocoPath, str) or isinstance(cocoPath, None), ('coco '
-            f'path expected either string or None, but found {type(cocoPath)}.')
+    def __init__(self, cocoPath=None):
+        assert (isinstance(cocoPath, str) or (cocoPath==None)), ('cocoPath '
+            f'expected either string or None, but found {type(cocoPath)}.')
 
         self.cocoPath = cocoPath
 
@@ -39,8 +39,8 @@ class CocoData():
                 captionData = json.load(captionFile)
                 capNum = len(captionData['annotations'])
                 for i, example in tqdm(enumerate(captionData['annotations']), total=capNum):
-                    # if i > 100:
-                    #     break
+                    if i > 100:
+                        break
                     imgId = example['image_id']
                     imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
                     print(imArray.shape, end='\n\n')
@@ -53,12 +53,19 @@ class CocoData():
             self.trainIdx = None
 
     def save(self, path):
-        """ Saves trainIdx to path """
+        """ Saves to path """
         u.safe_make_folder(path)
         u.save(self.trainIdx, f'{path}/trainIdx.sav', display=False)
 
-x = CocoData('data/inData/coco2014')
-# print(x.trainIdx)
-# x.save('test')
+    def load(self, path):
+        """ Loads from path """
+        u.assert_type('path', path, str)
+        assert u.os.path.exists(path), f'path "{path}" not found.'
+        self.trainIdx = u.load(f'{path}/trainIdx.sav')
 
-# x = CocoData()
+x = CocoData('data/inData/coco2014')
+print(x.trainIdx)
+x.save('test')
+del x
+x = CocoData()
+x.load('test')
