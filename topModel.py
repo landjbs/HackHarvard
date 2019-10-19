@@ -337,16 +337,24 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, folderPath):
+    def train_models(self, folderPath, batchSize):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
         generation.
         Args:
-            folderPath:         Path to the folder of np arrays on which to train
+            folderPath:         Path to the folder of arrays on which to train
             iter:               Number of iterations for which to train
+            batchSize:          Size of batch with with to train
         """
-        pass
+
+        fileList = [f'{file}' for file in os.listdir(folderPath)]
+
+        def make_discriminator_batch():
+            """
+            Makes discriminator batch from real images and generated images
+            """
+            
 
 
 

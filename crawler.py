@@ -71,11 +71,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     scrapeMetrics.add(True)
             else:
                 scrapeMetrics.add(True)
-<<<<<<< HEAD
-            scrapeMetrics.add(False)
-            return imArray
-=======
->>>>>>> 8e887ae3bedfd129aa14e31e77ac5b04829f8d91
 
             imArray[:,-2,0] = captionEmbedding[:256]
             imArray[:,-1,0] = captionEmbedding[256:512]
