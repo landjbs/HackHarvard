@@ -20,10 +20,26 @@ from processing.cleaner import clean_text, clean_url
 
 bc = BertClient(check_length=True)
 
+
+
+class Metrics():
+    """ Class to keep track of scrape progress """
+    def __init__(self):
+        self.count = 0
+        self.errors = 0
+
+    def add(self, error=False):
+        self.count += 1
+        if error:
+            self.errors += 1
+
+
+
 def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
     """ """
     u.safe_make_folder(outFolder)
 
+    scrapeMetrics = Metrics()
     urlQueue = Queue(maxsize=queueDepth)
     imgQueue = Queue(maxsize=(queueDepth+1))
     lineCounter = 0
@@ -42,7 +58,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                 imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
                 # print("built arrays")
             except:
-                return None
+                scrapeMetrics.add(True)
             if imArray is None:
                 return None
             if 256 <= imArray.shape[0] <= 1024:
@@ -52,9 +68,9 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     wOffset = int((imArray.shape[1] - 258)/2)
                     imArray = imArray[hOffset:hOffset + 256, wOffset:wOffset + 258,:]
                 else:
-                    return None
+                    scrapeMetrics.add(True)
             else:
-                return None
+                scrapeMetrics.add(True)
             return imArray
 
             imgQueue.task_done()
