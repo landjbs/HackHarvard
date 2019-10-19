@@ -338,7 +338,7 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, folderPath, iter, batchSize):
+    def train_models(self, folderPath, iter, batchSize, saveInt=500):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
@@ -347,12 +347,16 @@ class Image_Generator():
             folderPath:         Path to the folder of arrays on which to train
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
+            saveInt (opt):      Interval at which to save examples and struct
+                                of generator model. Defaults 500.
         """
         u.assert_type('folderPath', folderPath, str)
         u.assert_type('iter', iter, int)
         u.assert_type('batchSize', batchSize, int)
         u.assert_pos('iter', iter)
         u.assert_pos('batchSize', batchSize)
+
+        u.safe_make_folder('training_data')
 
         fileList = [f'{file}' for file in os.listdir(folderPath)]
         fileNum = len(fileList)
@@ -424,6 +428,13 @@ class Image_Generator():
             print(f'Cur Step: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
+
+            if (((i % saveInterval) == 0) and (i != 0)):
+                self.generate_and_plot(n=10, name=curStep, show=False,
+                                        outPath=f'training_data/{curStep}')
+                plt.close()
+                self.generatorStruct.save('training_data/'
+                                            f'generatorStruct_{curStep}.h5')
 
 
 
