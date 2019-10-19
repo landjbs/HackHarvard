@@ -71,6 +71,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     scrapeMetrics.add(True)
             else:
                 scrapeMetrics.add(True)
+            scrapeMetrics.add(False)
             return imArray
 
             imgQueue.task_done()
@@ -103,8 +104,9 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
             # convert img queue into single numpy array
             imgSize = imgQueue.qsize()
             imgTensor = np.zeros(shape=(imgSize, 256, 258, 3))
-
-
+            for i in range(imgSize):
+                curArray = imgQueue.get()
+                imgTensor[i, :, :, :] = curArray
 
 
 
