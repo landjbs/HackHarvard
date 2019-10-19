@@ -96,6 +96,7 @@ class Image_Generator():
         latent_reshape = Reshape(target_shape=LATENT_IMAGE_SHAPE,
                                 name='latent_reshape')(latent_relu)
         # run dropout over reshape latent image
-        latent_dropout = Dropout()
+        latent_dropout = Dropout(rate=DROPOUT,
+                                name='latent_dropout')(latent_reshape)
 
         ## FIRST UPSAMPLING ##
