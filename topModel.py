@@ -42,7 +42,7 @@ class Image_Generator():
         # default dropout; should prevent memorization
         self.DROPOUT            =   0.2
         # default kernel size
-        self.KERNEL_SIZE        =   5
+        self.KERNEL_SIZE        =   [5, 5]
         # default convolution stride length
         self.STRIDE             =   2
         # default alpha of LeakyReLU activation in discriminator
@@ -79,6 +79,8 @@ class Image_Generator():
         NORM_MOMENTUM   = self.NORM_MOMENTUM
         # rate of dropout
         DROPOUT = self.DROPOUT
+        # size of kernel
+        KERNEL_SIZE = self.KERNEL_SIZE
 
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
@@ -99,4 +101,19 @@ class Image_Generator():
         latent_dropout = Dropout(rate=DROPOUT,
                                 name='latent_dropout')(latent_reshape)
 
-        ## FIRST UPSAMPLING ##
+        ## FIRST UPSAMPLING BLOCK ##
+        upsample_1 = UpSampling2D(name='upsample_1')(latent_dropout)
+        transpose_1 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
+                                    padding='same')(upsample_1)
+        batch_1 = BatchNormalization()
+
+
+
+upsample_1 = UpSampling2D(name=f'upsample_{LAYER_COUNTER}')(dropout_latent)
+        transpose_1 = Conv2DTranspose(filters=self.gen_get_filter_num(LAYER_COUNTER),
+                                    kernel_size=KERNEL_SIZE,
+                                    padding='same',
+                                    name=f'transpose_{LAYER_COUNTER}')(upsample_1)
+        batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name=f'batch_{LAYER_COUNTER}')(transpose_1)
+        relu_1 = ReLU(name=f'relu_{LAYER_COUNTER}')(batch_1)
