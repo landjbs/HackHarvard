@@ -32,6 +32,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
         while True:
             # pop top url from queue
             cleanCaption, cleanUrl = imgQueue.get()
+            captionEmbedding = np.array(bc.encode([cleanCaption])[0])
 
             try:
                 # print(cleanedURL)
