@@ -1,3 +1,12 @@
+"""
+The Image_Generator is a new generation of Deep Convolutional GAN, which
+uses Recurrent Neural Networks and Attention Mechanisms to summarize text
+as a latent dimensional initialization vector for a generative network.
+Through a multi-layered and morphing training-process, the summarizer-generator
+pair is taught to capture the important details of an input text and to use
+them to construct and image that is both realistic and topical.
+"""
+
 from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
@@ -287,12 +296,13 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train(self, ):
+    def train_models(self, ):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
         generation.
         """
+        pass
 
 
 
