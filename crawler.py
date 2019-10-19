@@ -5,24 +5,22 @@ Outsources HTML processing to htmlAnalyzer.py
 Outsoucres database definitions to thicctable.py
 """
 
-from queue import Queue
-from threading import Thread
-from time import time
 import re
-import requests
-import shutil
-import numpy as np
 import cv2
 import urllib
-import utils as u
+import numpy as np
+from queue import Queue
+from threading import Thread
 from bert_serving.client import BertClient
+
+import utils as u
 from processing.cleaner import clean_text, clean_url
 
 bc = BertClient(check_length=True)
 
 def find_bert(BigArray):
     bert = np.zeros((imArray.shape[0], 1024))
-    for i in range(imArray.shape[0])
+    for i in range(imArray.shape[0]):
         bert[i,:256] = imArray[i,:,-2,0]
         bert[i,256:512] = imArray[i,:,-1,0]
         bert[i,512:768] = imArray[i,:,-2,1]
@@ -59,7 +57,7 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
 
             try:
                 # print(cleanedURL)
-                url_response = urllib.request.urlopen(cleanUrl,timeout=0.5)
+                url_response = urllib.request.urlopen(cleanUrl, timeout=0.5)
                 # print("accessed website")
                 imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
                 imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
@@ -126,3 +124,6 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
     print(f'\n{"-"*80}Scraping Complete:\n\tAnalyzed: {scrapeMetrics.count}' \
         f'Errors: {scrapeMetrics.errors}')
     return True
+
+
+process_caption_data('data/inData/captionsTrain.tsv', 'data/outData/trainArrays', queueDepth=10)

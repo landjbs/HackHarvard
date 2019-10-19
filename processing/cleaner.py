@@ -7,7 +7,6 @@ Functions:
 """
 
 import re
-from unidecode import unidecode
 secureMatcher = re.compile(r"https")
 
 # matches non-alphanumeric, space, or sentence-ending punctuation (dash must be at end)
@@ -23,8 +22,6 @@ def clean_text(rawString):
     Cleans rawString by replacing spaceMatcher and tagMatcher with a single
     space, removing non-alpha chars, and lowercasing alpha chars
     """
-    # replace accented characters with non-accent representation
-    deaccentedString = unidecode(rawString)
     # replace stripMatcher with ""
     cleanedString = re.sub(stripMatcher, "", rawString)
     # replace spaceMatcher with " " and strip surround whitespace
