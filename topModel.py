@@ -105,7 +105,17 @@ class Image_Generator():
         upsample_1 = UpSampling2D(name='upsample_1')(latent_dropout)
         transpose_1 = Conv2DTranspose(filters=64, kernel_size=KERNEL_SIZE,
                                     padding='same')(upsample_1)
-        batch_1 = BatchNormalization()
+        batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_1')(transpose_1)
+        relu_1 = ReLU(name='relu_1')(batch_1)
+
+        ## SECOND UPSAMPLING BLOCK ##
+        upsample_2 = UpSampling2D(name='upsample_2')(relu_1)
+        transpose_2 = Conv2DTranspose(filters=128, kernel_size=KERNEL_SIZE,
+                                    padding='same')(upsample_2)
+        batch_2 = BatchNormalization(momentum=NORM_MOMENTUM,
+                                    name='batch_2')(transpose_2)
+        relu_2 = ReLU(name='relu_2')(batch_2)
 
 
 
