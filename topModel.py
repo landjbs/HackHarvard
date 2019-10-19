@@ -10,7 +10,8 @@ them to construct and image that is both realistic and topical.
 from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
-                            UpSampling2D, Conv2DTranspose, Reshape)
+                            UpSampling2D, Conv2DTranspose, Reshape, LSTM,
+                            Bidirectional)
 import keras.backend as K
 from keras.optimizers import RMSprop
 
@@ -28,7 +29,7 @@ class Image_Generator():
         u.assert_type('maxTextLen', maxTextLen, int)
         u.assert_pos('maxTextLen', maxTextLen)
         ## text specs ##
-        self.maxTextLen    = maxTextLen
+        self.maxTextLen     = maxTextLen
         self.EMBEDDING_DIM  = 1024
         ## image specs ##
         self.IMG_SHAPE = (512, 512, 3)
@@ -75,15 +76,15 @@ class Image_Generator():
         EMBEDDING_DIM dimensions.
         """
         # matix of word encodings
-        word_inputs = Input(shape=(self.BERT_DIM, self.MAX_CAPTION_LEN),
+        word_inputs = Input(shape=(self.EMBEDDING_DIM, self.maxTextLen),
                             name='word_encodings')
         # vector of cls
-        cls_input = Input(shape=(self.BERT_DIM, ), name='cls_input')
+        cls_input = Input(shape=(self.EMBEDDING_DIM,), name='cls_input')
         # define structure of bidirectional lstm
-        gru = Bidirectional(GRU(units=self.LATENT_DIM, activation='relu',
+        lstm = Bidirectional(LSTM(units=self.EMBEDDING_DIM, activation='relu',
                                     return_state=True))
         # get outputs of lstm run over word_inputs with cls initial state
-        lstm_out, hidden, cell = gru(word_inputs, initial_state=cls_input)
+        lstm_out, hidden, cell = lstm(word_inputs, initial_state=cls_input)
         summarizerStructure = Model(inputs=[cls_input, word_inputs],
                                     outputs=cell)
 
@@ -94,12 +95,12 @@ class Image_Generator():
         shape (rowNum, colNum, channelNum)
         """
         ## TRAINING PARAMS ##
-        DENSE_NODES     = (8 * 8 * self.EMBEDDING_DIM)
-        LATENT_IMG_SHAPE = (8, 8, self.EMBEDDING_DIM)
-        NORM_MOMENTUM   = self.NORM_MOMENTUM
-        DROPOUT = self.DROPOUT
-        KERNEL_SIZE = self.KERNEL_SIZE
-        STRIDE = self.STRIDE
+        DENSE_NODES         = (8 * 8 * self.EMBEDDING_DIM)
+        LATENT_IMG_SHAPE    = (8, 8, self.EMBEDDING_DIM)
+        NORM_MOMENTUM       = self.NORM_MOMENTUM
+        DROPOUT             = self.DROPOUT
+        KERNEL_SIZE         = self.KERNEL_SIZE
+        STRIDE              = self.STRIDE
         ## LATENT STAGE ##
         # initialize generator with embedding vector from text
         latent_embedding = Input(shape=(self.EMBEDDING_DIM, ),
@@ -318,5 +319,5 @@ class Image_Generator():
 
 
 
-x = Image_Generator(1,1,1)
-x.initialize_models()
+x = Image_Generator(1)
+x.build_summarizer()
