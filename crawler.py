@@ -8,14 +8,65 @@ Outsoucres database definitions to thicctable.py
 from queue import Queue
 from threading import Thread
 from time import time
-from termcolor import colored
+import re
+import requests
+import shutil
+import numpy as np
+import cv2
+import urllib
 
-from crawlers.urlAnalyzer import fix_url
-from crawlers.htmlAnalyzer import scrape_url
-from dataStructures.scrapingStructures import Simple_List, Metrics
-from dataStructures.objectSaver import save, load
-from models.knowledge.knowledgeBuilder import build_knowledgeProcessor
+def url_to_nice_array(cleanedURL):
+    try:
+        # print(cleanedURL)
+        url_response = urllib.request.urlopen(cleanedURL,timeout=0.5)
+        # print("accessed website")
+        imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
+        imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
+        # print("built arrays")
+    except:
+        return None
+    if imArray is None:
+        return None
+    if 256 <= imArray.shape[0] <= 1024:
+        if 258 <= imArray.shape[1] <= 1024:
+            # print("cropping")
+            hOffset = int((imArray.shape[0] - 256)/2)
+            wOffset = int((imArray.shape[1] - 258)/2)
+            imArray = imArray[hOffset:hOffset + 256, wOffset:wOffset + 258,:]
+        else:
+            return None
+    else:
+        return None
+    return imArray
 
+    # try:
+    #     imgFetch = requests.get(cleanedURL, headers={'User-Agent': 'Custom'}, stream=True, timeout=0.1)
+    # except:
+    #     return None
+    #
+    # path = f"data/inData/batchImg{str(count)}.jpg"
+    # with open(path, 'wb') as f:
+    #     imgFetch.raw.decode_content = True
+    #     # imgArray = PIL2array(imgFetch.raw)
+    #     try:
+    #         shutil.copyfileobj(imgFetch.raw, f)
+    #     except:
+    #         return None
+    #
+    # imArray = cv2.imread(path)
+    # if imArray is not None:
+    #     imArray = imArray[:,:,::-1]
+    # else:
+    #     return None
+    # if 512 <= imArray.shape[0] <= 1024:
+    #     if 512 <= imArray.shape[1] <= 1024:
+    #         hOffset = int((imArray.shape[0] - 512)/2)
+    #         wOffset = int((imArray.shape[1] - 512)/2)
+    #         imArray = imArray[hOffset:hOffset + 512, wOffset:wOffset + 512,:]
+    #     else:
+    #         return None
+    # else:
+    #     return None
 
 def scrape_urlList(urlList, runTime=100000000, queueDepth=1000000, workerNum=2):
     """
@@ -23,52 +74,40 @@ def scrape_urlList(urlList, runTime=100000000, queueDepth=1000000, workerNum=2):
     seconds.
     """
 
-    # load models and datasets
-    print(colored('Loading freqDict', color='red'), end='\r')
-    freqDict = load('data/outData/knowledge/freqDict.sav')
-    print(colored('Complete: Loading freqDict', color='cyan'))
-
-    print(colored('Loading knowledgeProcessor', color='red'), end='\r')
-    knowledgeProcessor = load('data/outData/knowledge/knowledgeProcessor.sav')
-    print(colored('Complete: Loading knowledgeProcessor', color='cyan'))
-
     # queue to hold urlList
-    urlQueue = Queue(queueDepth)
-    # set to hold , previously scraped URLs
-    scrapedUrls = set()
-    # struct to keep track of metrics
-    scrapeMetrics = Metrics()
-    testSimple = Simple_List()
+    imgQueue = Queue(queueDepth)
 
     # find time at which to stop analyzing
     stopTime = round(time() + runTime)
 
-    def enqueue_urlList(urlList):
+    def enqueue_urlList(captionFile):
         """
         Cleans and enqueues URLs contained in urlList, checking if
         previously scraped
         """
-        for url in urlList:
-            if not url in scrapedUrls:
-                scrapedUrls.add(url)
-                urlQueue.put(url)
+        with open(filePath, 'r') as captionFile:
+            for line in captionFile:
+                lineSplit = re.split('\t', line)
+                assert (len(lineSplit)==2), ('line expected length 2, but found '
+                                            f'length {len(lineSplit)}')
+                # get caption
+                lineCap = lineSplit.pop(0)
+                # get url
+                cleanedURL = re.sub(secureMatcher, "http", lineSplit[0].strip("\n"))
+                imgQueue.put((lineCap,cleanedURL))
 
     def worker():
         """ Scrapes popped URL from urlQueue and stores data in database"""
         while True:
             # pop top url from queue
-            url = urlQueue.get()
+            cleanedURL = imgQueue.get()
 
             try:
-                pageDict = scrape_url(url, knowledgeProcessor, freqDict)
-                # pull list of links from pageDict and put in urlQueue
-                # enqueue_urlList(pageDict['linkList'])
-                testSimple.add(pageDict)
-                # update scrape metrics
-                scrapeMetrics.add(error=False)
+                imArray = url_to_array(cleanedURL)
 
-            except Exception as e:
-                scrapeMetrics.add(error=True)
+            except:
+                imgQueue.task_done()
+                continue
 
             # save progress every 10 items
             if (len(testSimple.data) == 10):
@@ -80,7 +119,7 @@ def scrape_urlList(urlList, runTime=100000000, queueDepth=1000000, workerNum=2):
             # log progress
             print(f"\tURLs ANALYZED: {scrapeMetrics.count} | Errors: {scrapeMetrics.errors} | Queue Size: {urlQueue.qsize()}", end="\r")
             # signal completion
-            urlQueue.task_done()
+            imgQueue.task_done()
 
     # spawn workerNum workers
     for _ in range(workerNum):
