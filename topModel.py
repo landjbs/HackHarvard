@@ -73,6 +73,12 @@ class Image_Generator():
         self.describerModel.save(f'{path}/describerModel.h5')
         self.adversarialModel.save(f'{path}/adversarialModel.h5')
         self.creativeModel.save(f'{path}/creativeModel.h5')
+        print(f"Model saved to {path}.")
+        return True
+
+    def load(self, path):
+        """ Loads Image_Generator() saved at path """
+        u.assert_type('path', path, str)
 
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
