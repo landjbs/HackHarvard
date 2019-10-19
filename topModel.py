@@ -337,7 +337,7 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, folderPath, batchSize):
+    def train_models(self, folderPath, iter, batchSize):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
@@ -347,14 +347,40 @@ class Image_Generator():
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
         """
+        u.assert_type('folderPath', folderPath, str)
+        u.assert_type('iter', iter, int)
+        u.assert_type('batchSize', batchSize, int)
+        u.assert_pos('iter', iter)
+        u.assert_pos('batchSize', batchSize)
 
         fileList = [f'{file}' for file in os.listdir(folderPath)]
 
-        def make_discriminator_batch():
+        def make_discriminator_batch(captions, images):
             """
             Makes discriminator batch from real images and generated images
             """
-            
+            pass
+
+        def make_describer_batch(captions, images):
+            """
+            Makes describer batch from real caption cls and describer-generated
+            pseudo-cls tokens
+            """
+            pass
+
+        def make_adversarial_batch(captions):
+            """
+            Makes adversarial batch of entirely fake, positively-scored images
+            using captions for generator improvement
+            """
+            pass
+
+        def make_creative_batch(captions, images):
+            """
+            Makes creative batch of fake images and real captions for
+            generator improvement
+            """
+            pass
 
 
 
