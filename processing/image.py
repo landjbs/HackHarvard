@@ -3,14 +3,19 @@ Utils for cleaning and processing all images encountered by models.
 """
 
 import numpy as np
-from wand.img import Image
+from wand.image import Image
 
 # LANDON BERT
 # bert-serving-start -model_dir /Users/landon/Desktop/bertLarge -num_worker=3
 
-def load_and_filter_image(imPath, ):
-    with Image(imPath) as img:
-        return np.array(img.liquid_rescale(512, 512))
+def load_and_filter_image(imPath):
+    with Image(filename=imPath) as img:
+        rowLen, colLen = img.size
+        if 0.6 < (rowLen / colLen) < 1.4:
+            img.resize(512, 512)
+            return np.array(img)
+        else:
+            raise ValueError(f'Image has invalid dims ({rowLen}, {colLen}).')
 
 
 def filter_image(imArray, outDim, upperBound=1024):

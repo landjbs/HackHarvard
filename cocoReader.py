@@ -45,14 +45,14 @@ class CocoData():
 
                     imgId = example['image_id']
                     captionText = text.clean_text(example['caption'])
-                    imArray = load_and_filter_image(f"{imageFolder}/{imIdx[imgId]}")
+                    imArray = image.load_and_filter_image(f"{imageFolder}/{imIdx[imgId]}")
                     assert imArray.shape == (512, 512, 3), f'{imArray.shape}'
                     # imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
                     # encode caption and clean image
                     try:
                         captionVec = text.text_to_cls(captionText)
                         cleanedIm = image.filter_image(imArray, outDim=480)
-                        yield (captionText, captionVec, cleanIm)
+                        yield (captionText, captionVec, imArray)
                     except Exception as e:
                         print(f'ERROR: {e}')
                         yield None
