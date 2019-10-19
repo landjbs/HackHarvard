@@ -2,7 +2,7 @@ from keras.models import Model, Sequential
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape)
-                            
+
 import utils as u
 
 
@@ -21,8 +21,8 @@ class Image_Generator():
         u.assert_pos('colNum', colNum)
         u.assert_pos('maxTextLen', maxTextLen)
         ## text specs ##
-        self.embeddingDim  = 1024
         self.maxTextLen    = maxTextLen
+        self.EMBEDDING_DIM  = 1024
         ## image specs ##
         self.rowNum         = rowNum
         self.colNum         = colNum
@@ -70,4 +70,4 @@ class Image_Generator():
         embeddingDim dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
-        inputs =
+        inputs = Input(shape=sel.EMBEDDING_DIM)
