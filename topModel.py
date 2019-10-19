@@ -72,8 +72,8 @@ class Image_Generator():
         """
         ## TRAINING PARAMS ##
         # number of nodes for dense network at latent stage
-        DENSE_NODES     = 500
-        # shape of reshaped latent dimensional vec (sqrt(1024), sqrt(1024))
+        DENSE_NODES     = (8 * 8 * self.EMBEDDING_DIM)
+        # shape of reshaped latent dimensional vec
         LATENT_IMAGE_SHAPE = (32, 32)
         # momentum of batch norm
         NORM_MOMENTUM   = self.NORM_MOMENTUM
@@ -135,14 +135,4 @@ class Image_Generator():
                                     name='batch_4')(transpose_4)
         relu_4 = ReLU(name='relu_4')(batch_4)
 
-
-
-
-upsample_1 = UpSampling2D(name=f'upsample_{LAYER_COUNTER}')(dropout_latent)
-        transpose_1 = Conv2DTranspose(filters=self.gen_get_filter_num(LAYER_COUNTER),
-                                    kernel_size=KERNEL_SIZE,
-                                    padding='same',
-                                    name=f'transpose_{LAYER_COUNTER}')(upsample_1)
-        batch_1 = BatchNormalization(momentum=NORM_MOMENTUM,
-                                    name=f'batch_{LAYER_COUNTER}')(transpose_1)
-        relu_1 = ReLU(name=f'relu_{LAYER_COUNTER}')(batch_1)
+        ## FIFTH UPSAMPLING BLOCK ##
