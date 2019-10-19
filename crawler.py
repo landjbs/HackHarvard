@@ -26,7 +26,7 @@ def find_bert(imArray):
     bert[256:512] = imArray[:,-1,0]
     bert[512:768] = imArray[:,-2,1]
     bert[768:] = imArray[:,-1,1]
-    return bert
+    return bert, imArray[:,:-2,:]
 
 class Metrics():
     """ Class to keep track of scrape progress """
