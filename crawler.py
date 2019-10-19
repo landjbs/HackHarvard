@@ -90,6 +90,8 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
 
         while lineCounter < lineMax:
             for i, line in enumerate(dataFile):
+                if ((i % queueDepth) == 0 and (i != 0)):
+                    break
                 lineSplit = re.split('\t', line)
                 assert (len(lineSplit)==2), ('line expected length 2, but found '
                                             f'length {len(lineSplit)}')
@@ -98,6 +100,10 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                 cleanUrl = clean_url(lineSplit[0])
                 sampleTuple = (cleanCaption, cleanUrl)
                 urlQueue.put(sampleTuple)
+            # convert img queue into single numpy array
+            imgSize = imgQueue.qsize()
+            imgTensor = np.zeros(shape=(imgSize, 256, 258, 3))
+
 
 
 
