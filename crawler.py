@@ -55,6 +55,10 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
                     return None
             else:
                 return None
+            # imArray[:,-2,0] = captionEmbedding[:256]
+            # imArray[:,-1,0] = captionEmbedding[256:512]
+            # imArray[:,-2,1] = captionEmbedding[512:768]
+            # imArray[:,-1,1] = captionEmbedding[768:]
             return imArray
 
             imgQueue.task_done()
