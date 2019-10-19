@@ -3,7 +3,7 @@ from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape)
 import keras.backend as K
-
+from keras.optimizers import RMSprop
 
 import utils as u
 
@@ -57,6 +57,13 @@ class Image_Generator():
     def __str__(self):
         return (f'<Image_Generator Model | INIT={self.init} '
                 f'| ITER={self.curIter}>')
+
+    ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
+    def distance_loss(layer):
+        """ Custom loss for euclidean distance minimization """
+        def loss(y_true,y_pred):
+            return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
+        return loss
 
     def build_summarizer(self):
         """
@@ -242,33 +249,27 @@ class Image_Generator():
         self.describerStruct = model
         return True
 
-    def compile_discriminator(self):
+    def compile_discriminator(self, learningRate=0.1, decay=0.1):
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         binaryLoss = 'binary_crossentropy'
-        discriminatorModel = self.discriminatorStructure
+        discriminatorModel = self.discriminatorStruct
         discriminatorModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
                                 metrics=['accuracy'])
         self.discriminatorModel = discriminatorModel
         return discriminatorModel
 
-    def compile_describer(self):
+    def compile_describer(self, learningRate=0.1, decay=0.1):
         """ FINISH """
-
-        def distance_loss(layer):
-            """ Custom loss for euclidean dist minimization """
-            def loss(y_true,y_pred):
-                return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
-            return loss
 
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         describerModel = self.describerStruct
         describerModel.compile(optimizer=rmsOptimizer,
-                                loss=distance_loss(ouputs),
+                                loss=self.distance_loss(describerModel.layers[-1]),
                                 metrics=['accuracy'])
         self.describerModel = describerModel
         return describerModel
 
-    def compile_adversarial(self):
+    def compile_adversarial(self, learningRate=0.1, decay=0.1):
         """ FINSIH """
         rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
         binaryLoss = 'binary_crossentropy'
@@ -281,8 +282,9 @@ class Image_Generator():
         self.adversarialModel = adversarialModel
         return adversarialModel
 
-    def compile_creative(self):
+    def compile_creative(self, learningRate=0.1, decay=0.1):
         """ to do """
+        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
 
         def distance_loss(layer):
             """ Custom loss for euclidean dist minimization """
@@ -293,7 +295,8 @@ class Image_Generator():
         creativeModel = Sequential()
         creativeModel.add(self.generatorStruct)
         creativeModel.add(self.describerStruct)
-        creativeModel.compile(optimizer=rmsOptimizer, loss=distance_loss)
+        creativeModel.compile(optimizer=rmsOptimizer,
+                            loss=distance_loss(creativeModel.layers[-1]))
         self.creativeModel = creativeModel
         return creativeModel
 
@@ -306,27 +309,11 @@ class Image_Generator():
         self.compile_adversarial()
         self.compile_creative()
         self.init = True
+        print(self.creativeModel.summary())
 
-
-
-
-
-
-# self.discriminatorModel     = None
-# self.describerModel         = None
-# self.adversarialModel       = None
-# self.creativeModel          = None
-
-
-
-
-
-model.compile(optimizer='adam',
-      loss=distance_loss(outputs),
-      metrics=['accuracy'])
 
 
 
 
 x = Image_Generator(1,1,1)
-x.build_describer()
+x.build_model()
