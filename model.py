@@ -392,6 +392,10 @@ class Image_Generator():
             """
             pass
 
+        def update_lr(lr,discL,discA, descL, advL,
+                      advA, creativel, trainingRound):
+
+
         for i in range(iter):
             # load array of current batch
             batchArray = np.load(fileList[(i % fileNum)])
@@ -433,7 +437,8 @@ class Image_Generator():
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
-            self.lr = update_lr()
+            self.lr = update_lr(lr,discL,discA, descL, advL, 
+                          advA, creativel, i)
 
             if (((i % saveInterval) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
