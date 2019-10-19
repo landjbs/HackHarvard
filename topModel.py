@@ -148,9 +148,43 @@ class Image_Generator():
 
         model = Model(inputs=latent_embedding, outputs=relu_6)
 
-
+        # TODO: save model and shit
         print(model.summary())
+
+    def build_descriminator(self):
+        """
+        Builds desciminator model
+        """
+        IMG_SHAPE = (512, 512, 3)
+        # rate of dropout
+        DROPOUT = self.DROPOUT
+        # size of kernel
+        KERNEL_SIZE = self.KERNEL_SIZE
+        # size of stride
+        STRIDE = self.STRIDE
+        LEAKY_ALPHA = self.LEAKY_ALPHA
+
+
+        img_in = Input(shape=(IMG_SHAPE, ), name='img_in')
+        # first conv block
+        conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_1')(img_in)
+        relu_1 = LeakyReLU(LEAKY_ALPHA, name=f'relu_1')(conv_1)
+        drop_1 = Dropout(rate=DROPOUT, name=f'drop_1')(relu_1)
+
+        # second conv block
+        conv_2 = Conv2D(filters=32, kernel_size=KERNEL_SIZE,
+                        strides=STRIDE, name='conv_2')(drop_1)
+        relu_2 = LeakyReLU(LEAKY_ALPHA, name=f'relu_2')(conv_2)
+        drop_2 = Dropout(rate=DROPOUT, name=f'drop_2')(relu_2)
+
+        # third conv block
+
+
+
+
+
 
 
 x = Image_Generator(1,1,1)
-x.build_generator()
+x.build_descriminator()
