@@ -62,10 +62,10 @@ class Image_Generator():
 
     def save(self, path):
         """ Saves Image_Generator() object to path """
+        assert self.initizalized, 'models must be initialized before saving.'
         u.assert_type('path', path, str)
         u.safe_make_folder(path)
-        assert self.initizalized, 'models must be initialized before saving.'
-        self.summarizerStruct.save(f'{path}/summarizerStruct.h5')
+        # self.summarizerStruct.save(f'{path}/summarizerStruct.h5')
         self.generatorStruct.save(f'{path}/generatorStruct.h5')
         self.discriminatorStruct.save(f'{path}/discriminatorStruct.h5')
         self.describerStruct.save(f'{path}/describerStruct.h5')
@@ -80,7 +80,7 @@ class Image_Generator():
         """ Loads Image_Generator() saved at path. Sets initialized to True """
         u.assert_type('path', path, str)
         assert (u.os.path.exists(path)), f"path {path} not found."
-        self.summarizerStruct = load_model(f'{path}/summarizerStruct.h5')
+        # self.summarizerStruct = load_model(f'{path}/summarizerStruct.h5')
         self.generatorStruct = load_model(f'{path}/generatorStruct.h5')
         self.discriminatorStruct = load_model(f'{path}/discriminatorStruct.h5')
         self.describerStruct = load_model(f'{path}/describerStruct.h5')
@@ -91,9 +91,9 @@ class Image_Generator():
         self.initizalized = True
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
-    def distance_loss(layer):
+    def distance_loss(self, layer):
         """ Custom loss for euclidean distance minimization """
-        def loss(y_true,y_pred):
+        def loss(y_true, y_pred):
             return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
         return loss
 
@@ -319,7 +319,7 @@ class Image_Generator():
 
     def initialize_models(self):
         """ Top-level func compiles all models and sets initialized to True """
-        assert (self.initizalized == None), 'model has already been built.'
+        assert not self.initizalized, 'model has already been built.'
         self.build_generator()
         self.build_discriminator()
         self.build_describer()
@@ -336,15 +336,15 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, folderPath):
-        """
-        Train summarizer, generator, discriminator, describer, adversarial,
-        and creative models on dataset with end-goal of text-to-image
-        generation.
-        Args:
-            folderPath:         Path to the folder of np arrays on which to train
-            iter:               Number of iterations for which to train
-        """
+    # def train_models(self, folderPath):
+    #     """
+    #     Train summarizer, generator, discriminator, describer, adversarial,
+    #     and creative models on dataset with end-goal of text-to-image
+    #     generation.
+    #     Args:
+    #         folderPath:         Path to the folder of np arrays on which to train
+    #         iter:               Number of iterations for which to train
+    #     """
 
 
 
@@ -352,6 +352,7 @@ class Image_Generator():
 
 
 
-
-x = Image_Generator(1)
-x.build_summarizer()
+x = Image_Generator()
+print('ini')
+x.initialize_models()
+x.save('test')
