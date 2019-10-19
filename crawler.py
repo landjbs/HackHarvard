@@ -24,7 +24,39 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
     """ """
     u.safe_make_folder(outFolder)
 
-    urlQueue = Queue(maxsize=10000)
+    urlQueue = Queue(maxsize=queueDepth)
+    imgQueue = Queue(maxsize=(queueDepth+1))
+    lineCounter = 0
+
+    def worker():
+        while True:
+            # pop top url from queue
+            cleanCaption, cleanUrl = imgQueue.get()
+
+            try:
+                # print(cleanedURL)
+                url_response = urllib.request.urlopen(cleanedURL,timeout=0.5)
+                # print("accessed website")
+                imArray = np.array(bytearray(url_response.read()),dtype=np.uint8)
+                imArray = cv2.imdecode(imArray, cv2.IMREAD_COLOR)
+                # print("built arrays")
+            except:
+                return None
+            if imArray is None:
+                return None
+            if 256 <= imArray.shape[0] <= 1024:
+                if 258 <= imArray.shape[1] <= 1024:
+                    # print("cropping")
+                    hOffset = int((imArray.shape[0] - 256)/2)
+                    wOffset = int((imArray.shape[1] - 258)/2)
+                    imArray = imArray[hOffset:hOffset + 256, wOffset:wOffset + 258,:]
+                else:
+                    return None
+            else:
+                return None
+            return imArray
+
+            imgQueue.task_done()
 
     # spawn workerNum workers
     for _ in range(workerNum):
@@ -34,13 +66,22 @@ def process_caption_data(dataPath, outFolder, queueDepth=10000, workerNum=30):
 
     # iterate over data file
     with open(dataPath, 'r') as dataFile:
-        for i, line in enumerate(dataFile):
-            lineSplit = re.split('\t', line)
-            assert (len(lineSplit)==2), ('line expected length 2, but found '
-                                        f'length {len(lineSplit)}')
-            caption = lineSplit.pop(0)
-            cleanCaption = clean_text(caption)
-            cleanedURL = clean_url(lineSplit[0])
+        # find number of lines in datafile
+        for lineMax, _ in enumerate(dataFile):
+            pass
+        dataFile.seek(0)
+
+        while lineCounter < lineMax:
+            for i, line in enumerate(dataFile):
+                lineSplit = re.split('\t', line)
+                assert (len(lineSplit)==2), ('line expected length 2, but found '
+                                            f'length {len(lineSplit)}')
+                caption = lineSplit.pop(0)
+                cleanCaption = clean_text(caption)
+                cleanUrl = clean_url(lineSplit[0])
+                sampleTuple = (cleanCaption, cleanUrl)
+                urlQueue.put(sampleTuple)
+
 
 
 
