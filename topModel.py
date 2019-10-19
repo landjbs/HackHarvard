@@ -22,9 +22,7 @@ class Image_Generator():
         self.maxTextLen    = maxTextLen
         self.EMBEDDING_DIM  = 1024
         ## image specs ##
-        self.rowNum         = rowNum
-        self.colNum         = colNum
-        self.CHANNEL_NUM    = 3
+        self.IMG_SHAPE = (512, 512, 3)
         ## object info ##
         self.curIter                = 0
         # model architectures
@@ -79,7 +77,7 @@ class Image_Generator():
         # number of nodes for dense network at latent stage
         DENSE_NODES     = (8 * 8 * self.EMBEDDING_DIM)
         # shape of reshaped latent dimensional vec
-        LATENT_IMAGE_SHAPE = (8, 8, self.EMBEDDING_DIM)
+        LATENT_IMG_SHAPE = (8, 8, self.EMBEDDING_DIM)
         # momentum of batch norm
         NORM_MOMENTUM   = self.NORM_MOMENTUM
         # rate of dropout
@@ -102,7 +100,7 @@ class Image_Generator():
         # relu activation over latent dense after batch norm
         latent_relu = ReLU(name='relu_latent')(latent_batch)
         # reshape latent dimensions into picture size
-        latent_reshape = Reshape(target_shape=LATENT_IMAGE_SHAPE,
+        latent_reshape = Reshape(target_shape=LATENT_IMG_SHAPE,
                                 name='latent_reshape')(latent_relu)
         # run dropout over reshape latent image
         latent_dropout = Dropout(rate=DROPOUT,
@@ -157,89 +155,80 @@ class Image_Generator():
 
     def build_discriminator(self):
         """
-        Builds desciminator model
+        Builds structure for the discriminator model, which uses convolutional
+        and dense networks to output sigmoid-normed scalar indicating belief
+        that an image is real.
         """
-        IMG_SHAPE = (512, 512, 3)
-        # rate of dropout
+        IMG_SHAPE = self.IMG_SHAPE
         DROPOUT = self.DROPOUT
-        # size of kernel
         KERNEL_SIZE = self.KERNEL_SIZE
-        # size of stride
         STRIDE = self.STRIDE
         LEAKY_ALPHA = self.LEAKY_ALPHA
-
-        img_in = Input(shape=IMG_SHAPE, name='img_in')
         # first conv block
+        img_in = Input(shape=IMG_SHAPE, name='img_in')
         conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_1')(img_in)
         relu_1 = LeakyReLU(LEAKY_ALPHA, name=f'relu_1')(conv_1)
         drop_1 = Dropout(rate=DROPOUT, name=f'drop_1')(relu_1)
-
         # second conv block
         conv_2 = Conv2D(filters=32, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_2')(drop_1)
         relu_2 = LeakyReLU(LEAKY_ALPHA, name=f'relu_2')(conv_2)
         drop_2 = Dropout(rate=DROPOUT, name=f'drop_2')(relu_2)
-
         # third conv block
         conv_3 = Conv2D(filters=64, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_3')(drop_2)
         relu_3 = LeakyReLU(LEAKY_ALPHA, name=f'relu_3')(conv_3)
         drop_3 = Dropout(rate=DROPOUT, name=f'drop_3')(relu_3)
-
         # fourth conv block
         conv_4 = Conv2D(filters=128, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_4')(drop_3)
         relu_4 = LeakyReLU(LEAKY_ALPHA, name=f'relu_4')(conv_4)
         drop_4 = Dropout(rate=DROPOUT, name=f'drop_4')(relu_4)
-
         # dense net
         flat = Flatten(name='flat')(drop_4)
         outputs = Dense(units=1, activation='sigmoid', name='outputs')(flat)
         model = Model(inputs=img_in, outputs=outputs)
         self.discriminatorStruct = model
+        return True
 
     def build_describer(self):
         """
+        Builds structure for the describer model, which uses convolutional
+        and dense networks to convert an image into EMBEDDING_DIM vector.
         """
-        IMG_SHAPE = (512, 512, 3)
-        # rate of dropout
+        # cache params
+        IMG_SHAPE = self.IMG_SHAPE
         DROPOUT = self.DROPOUT
-        # size of kernel
         KERNEL_SIZE = self.KERNEL_SIZE
-        # size of stride
         STRIDE = self.STRIDE
         LEAKY_ALPHA = self.LEAKY_ALPHA
-
-        img_in = Input(shape=IMG_SHAPE, name='img_in')
         # first conv block
+        img_in = Input(shape=IMG_SHAPE, name='img_in')
         conv_1 = Conv2D(filters=16, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_1')(img_in)
         relu_1 = LeakyReLU(LEAKY_ALPHA, name=f'relu_1')(conv_1)
         drop_1 = Dropout(rate=DROPOUT, name=f'drop_1')(relu_1)
-
         # second conv block
         conv_2 = Conv2D(filters=32, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_2')(drop_1)
         relu_2 = LeakyReLU(LEAKY_ALPHA, name=f'relu_2')(conv_2)
         drop_2 = Dropout(rate=DROPOUT, name=f'drop_2')(relu_2)
-
         # third conv block
         conv_3 = Conv2D(filters=64, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_3')(drop_2)
         relu_3 = LeakyReLU(LEAKY_ALPHA, name=f'relu_3')(conv_3)
         drop_3 = Dropout(rate=DROPOUT, name=f'drop_3')(relu_3)
-
         # fourth conv block
         conv_4 = Conv2D(filters=128, kernel_size=KERNEL_SIZE,
                         strides=STRIDE, name='conv_4')(drop_3)
         relu_4 = LeakyReLU(LEAKY_ALPHA, name=f'relu_4')(conv_4)
         drop_4 = Dropout(rate=DROPOUT, name=f'drop_4')(relu_4)
-
         # dense network
         flat = Flatten(name='flat')(drop_4)
-        outputs = Dense(units=1024, activation='sigmoid', name='outputs')(flat)
-
+        outputs = Dense(units=self.EMBEDDING_DIM, activation='sigmoid',
+                        name='outputs')(flat)
+        # model saved
         model = Model(inputs=img_in, outputs=outputs)
         self.describerStruct = model
         return True
@@ -289,6 +278,7 @@ class Image_Generator():
         return creativeModel
 
     def build_model(self):
+        assert (self.initizalized == None), 'model has already been built.'
         self.build_generator()
         self.build_discriminator()
         self.build_describer()
