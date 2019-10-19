@@ -1,5 +1,6 @@
 import utils as u
 
+
 class Image_Generator():
     """
     Top-level model comprising summarizer, generator, discriminator, and
@@ -64,4 +65,4 @@ class Image_Generator():
         embeddingDim dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
-        inputs = 
+        inputs =
