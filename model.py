@@ -404,6 +404,9 @@ class Image_Generator():
             (creativeX,
             creativeY) = make_creative_batch(captions, images)
             # train each model on respective batch
+
+            K.set_value(self.discriminatorModel.optimizer.lr,0.01)
+
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
             descData = self.describerModel.train_on_batch(describerX,
