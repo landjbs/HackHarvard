@@ -1,3 +1,5 @@
+import tensorflow as tf
+
 import utils as u
 
 
