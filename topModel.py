@@ -59,6 +59,7 @@ class Image_Generator():
             return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
         return loss
 
+    ## MODEL BUILDING ##
     def build_summarizer(self):
         """
         Builds and compiles summarizer model to read BERT matrix into vector of
@@ -267,7 +268,7 @@ class Image_Generator():
         self.creativeModel = creativeModel
         return creativeModel
 
-    def build_model(self):
+    def initialize_models(self):
         """ Top-level func compiles all models and sets initialized to True """
         assert (self.initizalized == None), 'model has already been built.'
         self.build_generator()
@@ -280,9 +281,16 @@ class Image_Generator():
         self.initizalized = True
         return True
 
+    ## IMAGE MANIPULATION ##
+    def image_from_textVec(self, textVec):
+        """ Uses generator model to generate image from BERT matrix """
+        return self.generatorStruct.predict(textVec)
+
+
+
 
 
 
 
 x = Image_Generator(1,1,1)
-x.build_model()
+x.initialize_models()
