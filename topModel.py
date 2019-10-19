@@ -51,3 +51,7 @@ class Image_Generator():
                 f'| ITER={self.curIter}>')
 
     def build_summarizer(self):
+        """
+        Builds and compiles summarizer model to read BERT matrix into vector of
+        embeddingDim dimensions.
+        """
