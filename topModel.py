@@ -408,7 +408,13 @@ class Image_Generator():
             creativeData = self.creativeModel.train_on_batch(creativeX,
                                                             creativeY)
             # round and log
-
+            discL, discA = round(discData[0], 3), round(discData[1], 3)
+            descL = round(descData, 3)
+            advL, advA = round(advData[0], 3), round(advData[1], 3)
+            creativeL = round(creativeData, 3)
+            print(f'Cur Step: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
+                f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
+                f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
 
 
