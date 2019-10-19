@@ -59,7 +59,7 @@ class Image_Generator():
     def build_summarizer(self):
         """
         Builds and compiles summarizer model to read BERT matrix into vector of
-        embeddingDim dimensions.
+        EMBEDDING_DIM dimensions.
         """
         # TODO: IMP SUMMARIZER
         pass
@@ -67,7 +67,8 @@ class Image_Generator():
     def build_generator(self):
         """
         Builds generator to convert latent initialization vector of
-        embeddingDim dimensions to third-rank tensor of
+        EMBEDDING_DIM dimensions to third-rank tensor of
         shape (rowNum, colNum, channelNum)
         """
-        inputs = Input(shape=sel.EMBEDDING_DIM)
+        # use 
+        inputs = Input(shape=sel.EMBEDDING_DIM, name='latent_embeddings')
