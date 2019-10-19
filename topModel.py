@@ -11,6 +11,9 @@ class Image_Generator():
         u.assert_type('rowNum', rowNum, int)
         u.assert_type('colNum', colNum, int)
         u.assert_type('maxTextLen', maxTextLen, int)
+        u.assert_pos('rowNum', rowNum)
+        u.assert_pos('colNum', colNum)
+        u.assert_pos('maxTextLen', maxTextLen)
         ## text specs ##
         self.embeddingDim  = 1024
         self.maxTextLen    = maxTextLen
