@@ -38,16 +38,30 @@ class CocoData():
             with open(captionPath, 'r') as captionFile:
                 captionData = json.load(captionFile)
                 capNum = len(captionData['annotations'])
-                for i, example in tqdm(enumerate(captionData['annotations']), total=capNum):
-                    if i > 100:
-                        break
-                    imgId = example['image_id']
-                    imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
-                    yield (example['id'], example['caption'], imArray)
+                i = 0
+                for example in tqdm(captionData['annotations'], total=capNum):
+                    i += 1
 
+                    if i > 10:
+                        break
+
+                    imgId = example['image_id']
+                    captionText = text.clean_text(example['caption'])
+                    imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
+                    # encode caption and clean image
+                    try:
+                        captionVec = text.text_to_cls(captionText)
+                        cleanedIm = image.filter_image(imArray)
+                        yield (captionVec, captionVec, imArray)
+                    except:
+                        yield None
+                        
         if cocoPath:
-            self.trainIdx = {i : dataTup for i, dataTup
-                            in tqdm(enumerate(coco_reader(cocoPath)))}
+            error_filter = lambda elt : elt != None
+            trainIdx = {i : dataTup for i, dataTup
+                        in tqdm(enumerate(coco_reader(cocoPath)))
+                        if not error_filter(dataTup)}
+            self.trainIdx = trainIdx
         else:
             self.trainIdx = None
 
