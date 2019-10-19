@@ -422,6 +422,7 @@ class Image_Generator():
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
             if (((i % saveInterval) == 0) and (i != 0)):
+                # TODO: imp generate_and_plot
                 self.generate_and_plot(n=10, name=curStep, show=False,
                                         outPath=f'training_data/{curStep}')
                 plt.close()
