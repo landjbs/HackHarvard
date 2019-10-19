@@ -3,11 +3,15 @@ Reads image/caption pairs from coco dataset, encoding captions and images
 into sampleTensor.
 """
 
+import re
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 
 import utils as u
+
+# re matcher to pull id from image path
+pathIdMatcher = re.compile(r'(?<=0)[1-9]\d*(?=.jpg)')
 
 class CocoData():
     """ Class to store observations from coco dataset """
@@ -16,16 +20,19 @@ class CocoData():
 
         def coco_reader(cocoPath):
             """ Reads coco path folders into object index """
-            # config string to access captions and index to access images
+            # config string
             captionPath = f'{cocoPath}/annotations/captions_train2014.json'
-            imagePathIter = u.os.listdir(f'{cocoPath}/train2014')
+            # build dict mapping image_id to string of image
+            path_to_id = lambda path : int(re.findall(pathIdMatcher, path)[0])
+            imageIdx = {path_to_id(path) : path
+                        for path in u.os.listdir(f'{cocoPath}/train2014')}
 
-            for imagePath in imagePathIter:
-                print(f'{cocoPath}/train2014/{imagePath}')
-
-            # with open(captionPath, 'r') as captionFile:
-            #     for sample in captionFile:
-            #         print(sample)
+            with open(captionPath, 'r') as captionFile:
+                for example in captionFile:
+                    caption = example['caption']
+                    exampleId = example['id']
+                    imgId = example['image_id']
+                    print(imageIdx[imgId])
 
         self.trainIdx = coco_reader(cocoPath)
 
