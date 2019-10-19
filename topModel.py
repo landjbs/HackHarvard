@@ -7,7 +7,7 @@ pair is taught to capture the important details of an input text and to use
 them to construct and image that is both realistic and topical.
 """
 
-from keras.models import Model, Sequential
+from keras.models import Model, Sequential, load_model
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
                             Flatten, Dense, BatchNormalization, ReLU,
                             UpSampling2D, Conv2DTranspose, Reshape, LSTM,
@@ -77,9 +77,18 @@ class Image_Generator():
         return True
 
     def load(self, path):
-        """ Loads Image_Generator() saved at path """
+        """ Loads Image_Generator() saved at path. Sets initialized to True """
         u.assert_type('path', path, str)
-
+        assert (u.os.path.exists(path)), f"path {path} not found."
+        self.summarizerStruct = load_model(f'{path}/summarizerStruct.h5')
+        self.generatorStruct = load_model(f'{path}/generatorStruct.h5')
+        self.discriminatorStruct = load_model(f'{path}/discriminatorStruct.h5')
+        self.describerStruct = load_model(f'{path}/describerStruct.h5')
+        self.discriminatorModel = load_model(f'{path}/discriminatorModel.h5')
+        self.describerModel = load_model(f'{path}/describerModel.h5')
+        self.adversarialModel = load_model(f'{path}/adversarialModel.h5')
+        self.creativeModel = load_model(f'{path}/creativeModel.h5')
+        self.initizalized = True
 
     ## CUSTOM LOSS FUNCTIONS, OPTIMIZERS, AND LR SCALERS ##
     def distance_loss(layer):
