@@ -287,31 +287,23 @@ class Image_Generator():
         self.adversarialModel = adversarialModel
         return adversarialModel
 
-def compile_adversarial(self, learningRate, decay, verbose=True):
-        """
-        Compiles generator model
-        Args:
-            learningRate (Opt):       Learning rate of RMSProp optimizer.
-            decay (Opt):              Decay of RMSProp optimizer.
-            verbose (Opt):            Whether to print model summary.
-        Returns:
-            Compiled adversarial model.
-        """
-        if self.adversarialCompiled:
-            raise self.ModelWarning('Adversarial has already been compiled.')
-        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
-        binaryLoss = 'binary_crossentropy'
-        # adversarial built by passing generator output through discriminator
-        adversarialModel = Sequential()
-        adversarialModel.add(self.generatorStructure)
-        adversarialModel.add(self.discriminatorStructure)
-        adversarialModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
-                                metrics=['accuracy'])
-        if verbose:
-            print(adversarialModel.summary())
-        self.adversarialCompiled = adversarialModel
-        return adversarialModel
+    def compile_creative(self):
+        """ to do """
 
+        def distance_loss(layer):
+            """ Custom loss for euclidean dist minimization """
+            def loss(y_true,y_pred):
+                return K.sqrt(K.sum(K.square(y_pred - y_true), axis=-1))
+            return loss
+
+        creativeModel = Sequential()
+        creativeModel.add(self.generatorStruct)
+        creativeModel.add(self.describerStruct)
+        creativeModel.compile(optimizer=rmsOptimizer, loss=distance_loss)
+        self.creativeModel = creativeModel
+        return creativeModel
+
+    
 
 
 
