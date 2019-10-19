@@ -66,19 +66,14 @@ def process_caption_data(dataPath, outFolder, queueDepth=100, workerNum=3):
                 scrapeMetrics.add(True)
                 urlQueue.task_done()
                 continue
-
-            imArray[:,-2,0] = captionEmbedding[:256]
-            imArray[:,-1,0] = captionEmbedding[256:512]
-            imArray[:,-2,1] = captionEmbedding[512:768]
-            imArray[:,-1,1] = captionEmbedding[768:]
-
-            # log and close task
-            scrapeMetrics.add(False)
-            print(f'URLs Analyzed: {scrapeMetrics.count} |'
-                f'Errors: {scrapeMetrics.errors}', end='\r')
-            imgQueue.put(imArray)
-            urlQueue.task_done()
-            imgQueue.task_done()
+            finally:
+                # log and close task
+                scrapeMetrics.add(False)
+                print(f'URLs Analyzed: {scrapeMetrics.count} |'
+                    f'Errors: {scrapeMetrics.errors}', end='\r')
+                imgQueue.put(imArray)
+                urlQueue.task_done()
+                imgQueue.task_done()
     # spawn workerNum workers
     for _ in range(workerNum):
         t = Thread(target=worker)
