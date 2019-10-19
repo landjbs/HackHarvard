@@ -3,9 +3,12 @@ Utils for cleaning and processing all text encountered by models.
 """
 
 import re
-secureMatcher = re.compile(r"https")
+from bert_serving.client import BertClient
 
+bc = BertClient(check_length=True)
 
+# matches https string
+secureMatcher = re.compile("https")
 # matches non-alphanumeric, space, or sentence-ending punctuation (dash must be at end)
 stripMatcher = re.compile(r'[^0-9a-zA-Z\t\n\s_.?!:;/<>*&^%$#@()"~`+-]')
 # matches any sequence of tabs, newlines, spaces, underscores, and dashes
@@ -29,3 +32,7 @@ def clean_text(rawString):
 def clean_url(rawUrl):
     """ Cleans url by replacing https with http """
     return re.sub(secureMatcher, "http", rawUrl.strip("\n").lower())
+
+def text_to_cls(cleanText):
+    """ Converts cleaned text to bert cls token """
+    return bc.encode([cleanText])[0]

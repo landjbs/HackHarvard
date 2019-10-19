@@ -5,22 +5,24 @@ into sampleTensor.
 
 import json
 
-class CocoObs():
-    """ Class to store single observation from coco dataset """
-    
-    def __init__(self, )
+import utils as u
 
 class CocoData():
     """ Class to store observations from coco dataset """
-
     def __init__(self, cocoPath):
         self.cocoPath = cocoPath
-        self.idx = {}
+
+        def coco_reader(cocoPath):
+            """ Reads coco path folders into object index """
+            # config string to access captions and index to access images 
+            captionPath = f'{cocoPath}/annotations/captions_train2014.json'
+            imagePathIter = u.os.listdir(f'{cocoPath}/train2014')
+
+            with open(captionPath, 'r') as captionFile:
+                for sample in captionFile:
+                    print(sample)
+
+        self.trainIdx = coco_reader(cocoPath)
 
 
-    def read_coco(cocoPath):
-        """ Reads captions and images from folders under coco path """
-        with open(f'{cocoPath}/annotations/captions_val2014.json', 'r') as annoFile:
-            data = json.load(cocoFile)
-            for elt in data['annotations']:
-                print(elt)
+x = CocoData('data/inData/coco2014')
