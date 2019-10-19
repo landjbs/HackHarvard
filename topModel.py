@@ -1,4 +1,4 @@
-from utils import assert_type
+import utils as u
 
 class Image_Generator():
     """
@@ -6,12 +6,14 @@ class Image_Generator():
     describer.
     """
 
-    def __init__(self, rowNum, colNum):
+    def __init__(self, rowNum, colNum, maxTextLen):
         # assertions
-        assert_type('rowNum', rowNum, int)
-        assert_type('colNum', colNum, int)
+        u.assert_type('rowNum', rowNum, int)
+        u.assert_type('colNum', colNum, int)
+        u.assert_type('maxTextLen', maxTextLen, int)
         ## text specs ##
         self.embeddingDim  = 1024
+        self.maxTextLen    = maxTextLen
         ## image specs ##
         self.rowNum         = rowNum
         self.colNum         = colNum

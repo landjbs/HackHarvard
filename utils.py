@@ -58,4 +58,8 @@ def safe_make_folder(folderPath):
 def assert_type(name, obj, t):
     """ Asserts obj has type t """
     assert isinstance(obj, t), (f'{name} expected type {t}, but found type '
-                                f'{type(obj)}')
+                                f'{type(obj)}.')
+
+def assert_pos(name, obj):
+    """ Assert numerical obj is positive """
+    assert (obj > 0), f'{name} must be positive.'
