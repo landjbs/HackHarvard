@@ -346,21 +346,6 @@ class Image_Generator():
         sampleImages = self.generatorStruct.predict(textVec)
         return sampleImages
 
-    def make_discriminator_batch(self, captions, images):
-        """
-        Makes discriminator batch from real images and generated images
-        Images must be (n,512,512,3)
-        """
-        fake_set = self.image_from_textVec(captions)
-        batch = np.concatenate((fake_set,images),axis=0)
-
-        num_fake = fake_set.shape[0]
-        num_real = images.shape[0]
-        answer_key = np.zeros(num_fake + num_real)
-        answer_key[num_fake:] = 1
-        print(answer_key)
-
-        return batch, answer_key
     ## TRAINING ##
     def train_models(self, folderPath, iter, batchSize, saveInt=500):
         """
@@ -391,7 +376,7 @@ class Image_Generator():
             Images must be (n,512,512,3)
             """
             fake_set = image_from_textVec(captions)
-            batch = np.concatenate(fake_set,images,axis=0)
+            batch = np.concatenate((fake_set,images),axis=0)
 
             num_fake = fake_set.shape[0]
             num_real = images.shape[0]
