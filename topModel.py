@@ -11,7 +11,7 @@ class Image_Generator():
         assert_type('rowNum', rowNum, int)
         assert_type('colNum', colNum, int)
         ## text specs ##
-        self.embeddeingDim  = 1024
+        self.embeddingDim  = 1024
         ## image specs ##
         self.rowNum         = rowNum
         self.colNum         = colNum
