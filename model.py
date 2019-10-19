@@ -59,7 +59,7 @@ class Image_Generator():
         self.NORM_MOMENTUM      =   0.9
         # initial learning rates [disc,desc,adv,creative]
         #TODO determine values
-        self.INIT_LR            =   [1,1,0,0]
+        self.INIT_LR            =   [1,0.1,0,0]
 
     ## OBJECT UTILS ##
     def __str__(self):
@@ -390,33 +390,41 @@ class Image_Generator():
             """
             Makes describer batch from real caption cls and describer-generated
             pseudo-cls tokens
+            captions: (n,1024)
+            images: (n,512,512,3)
             """
-            pass
+            correct_captions = captions
+            images_to_caption = images
+            return images_to_caption, correct_captions
 
         def make_adversarial_batch(captions):
             """
             Makes adversarial batch of entirely fake, positively-scored images
             using captions for generator improvement
+            captions: (n,1024)
             """
-            pass
+            score = np.ones(captions.shape[0])
+            return captions, score
 
         def make_creative_batch(captions, images):
             """
             Makes creative batch of fake images and real captions for
             generator improvement
             """
-            pass
+            return captions, captions
 
         def update_lr(lr,discL,discA, descL, advL,
                       advA, creativel, trainingRound):
-            pass
+            lr[0] = lr[0] - lr[0]*(advA - 0.5)
+            lr[1] = 0.1
+            lr[2] = lr[2]
+            lr[3] = lr[3]
+            return lr
 
         for i in range(iter):
             # load array of current batch
             # batchArray = np.load(fileList[(i % fileNum)])
             captionList, vecList, imList = dataObj.fetch_batch(batchSize)
-            # pull caption encodings from batchArray
-            bertBatch, imBatch = decode_batchArray(batchArray)
             # make batches for each model from batchArray
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captions, images)
@@ -440,10 +448,11 @@ class Image_Generator():
                                                             discriminatorY)
             descData = self.describerModel.train_on_batch(describerX,
                                                         describerY)
+
             advData = self.adversarialModel.train_on_batch(adversarialX,
                                                             adversarialY)
             creativeData = self.creativeModel.train_on_batch(creativeX,
-                                                            creativeY)
+                                                                creativeY)
             # round and log
             discL, discA = round(discData[0], 3), round(discData[1], 3)
             descL = round(descData, 3)
