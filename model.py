@@ -511,7 +511,7 @@ network.initialize_models()
 
 coco = CocoData()
 coco.load('CocoData')
-network.train_models(coco, 400, 200, saveInt=5)
+network.train_models(coco, iter=400, preIter=6, batchSize=200, saveInt=5)
 
 ## PLOTTTING BONES ##
 # import numpy as np

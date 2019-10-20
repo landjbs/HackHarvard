@@ -41,8 +41,8 @@ def delete_and_make_folder(folderPath):
 def safe_make_folder(folderPath):
     """ Wraps delete_and_make_folder but checks with the user first """
     if os.path.exists(folderPath):
-        deleteAction = input(f"""{folderPath} already exists.
-                                Are you sure you want to delete it? (y/n): """)
+        deleteAction = input(f"'{folderPath}' already exists.\n"
+                            'Are you sure you want to delete it? (y/n): ')
         if (deleteAction == 'y'):
             delete_and_make_folder(folderPath)
             return True
