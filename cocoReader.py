@@ -99,9 +99,10 @@ class CocoData():
         batchCaptions, batchTextVecs, batchImages = [], [], []
         for id in batchIds:
             sampleTup = self.trainIdx[id]
+            imArray = sampleTup[2] / 255
             batchCaptions.append(sampleTup[0])
             batchTextVecs.append(sampleTup[1])
-            batchImages.append(sampleTup[2])
+            batchImages.append(imArray)
         return (batchCaptions, np.array(batchTextVecs), np.array(batchImages))
 
 

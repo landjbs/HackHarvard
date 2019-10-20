@@ -428,16 +428,19 @@ class Image_Generator():
             captionStrings, captionVecs, images = dataObj.fetch_batch(batchSize)
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captionVecs, images)
-            (describerX,
-            describerY) = make_describer_batch(captionVecs, images)
+            # (describerX,
+            # describerY) = make_describer_batch(captionVecs, images)
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
-            descData = self.describerModel.train_on_batch(describerX,
-                                                        describerY)
+            # descData = self.describerModel.train_on_batch(describerX,
+            #                                             describerY)
             discL, discA = round(discData[0], 3), round(discData[1], 3)
-            descL = round(descData, 3)
-            print(f'PreIter: {curPre}\n\tDiscriminator: [L: {discL} |'
-                f' A: {discA}]\n\tDescriber: [L: {descL}]\n{"-"*80}')
+            # descL = round(descData, 3)
+            print(f'PreIter: {curPre}\n\tDiscriminator:'
+                f'[L: {discL} | A: {discA}]\n\t{"-"*80}')
+                # f'Describer: [L: {descL}]\n')
+
+
 
         startTime = time()
         for i in range(iter):
@@ -447,12 +450,12 @@ class Image_Generator():
             # make batches for each model from batchArray
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captionVecs, images)
-            (describerX,
-            describerY) = make_describer_batch(captionVecs, images)
+            # (describerX,
+            # describerY) = make_describer_batch(captionVecs, images)
             (adversarialX,
             adversarialY) = make_adversarial_batch(captionVecs)
-            (creativeX,
-            creativeY) = make_creative_batch(captionVecs, images)
+            # (creativeX,
+            # creativeY) = make_creative_batch(captionVecs, images)
             # train each model on respective batch
 
             # if i == 0:
@@ -466,23 +469,23 @@ class Image_Generator():
 
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
-            descData = self.describerModel.train_on_batch(describerX,
-                                                        describerY)
+            # descData = self.describerModel.train_on_batch(describerX,
+            #                                             describerY)
 
             advData = self.adversarialModel.train_on_batch(adversarialX,
                                                             adversarialY)
-            creativeData = self.creativeModel.train_on_batch(creativeX,
-                                                                creativeY)
+            # creativeData = self.creativeModel.train_on_batch(creativeX,
+            #                                                     creativeY)
             # round and log
             discL, discA = round(discData[0], 3), round(discData[1], 3)
-            descL = round(descData, 3)
+            # descL = round(descData, 3)
             advL, advA = round(advData[0], 3), round(advData[1], 3)
-            creativeL = round(creativeData, 3)
-            print(f'Iter: {i} | Runtime: {time() - startTime}\n\t'
+            # creativeL = round(creativeData, 3)
+            print(f'Iter: {i} | Runtime: {round(time() - startTime)}\n\t'
                 f'Discriminator: [L: {discL} | A: {discA}]\n\t'
-                f'Describer: [L: {descL}]\n\t'
-                f'Adversarial: [L: {advL} A: {advA}]\n\t'
-                f'Creative: [L {creativeL}]\n{"-"*80}')
+                # f'Describer: [L: {descL}]\n\t'
+                f'Adversarial: [L: {advL} A: {advA}]\n\t\n{"-"*80}')
+                # f'Creative: [L {creativeL}]\n{"-"*80}')
 
             # self.lr = update_lr(lr,discL,discA, descL, advL,
             #               advA, creativel, i)
@@ -511,7 +514,7 @@ network.initialize_models()
 
 coco = CocoData()
 coco.load('CocoData')
-network.train_models(coco, iter=400, preIter=6, batchSize=200, saveInt=5)
+network.train_models(coco, iter=400, preIter=0, batchSize=200, saveInt=5)
 
 ## PLOTTTING BONES ##
 # import numpy as np
