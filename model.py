@@ -279,9 +279,9 @@ class Image_Generator():
         self.describerStruct = model
         return True
 
-    def compile_discriminator(self, learningRate=0.1, decay=0.1):
+    def compile_discriminator(self, learningRate=0.1):
         """ Compiles discriminator model """
-        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        rmsOptimizer = RMSprop(lr=learningRate)
         binaryLoss = 'binary_crossentropy'
         discriminatorModel = self.discriminatorStruct
         discriminatorModel.compile(optimizer=rmsOptimizer, loss=binaryLoss,
@@ -289,18 +289,18 @@ class Image_Generator():
         self.discriminatorModel = discriminatorModel
         return discriminatorModel
 
-    def compile_describer(self, learningRate=0.1, decay=0.1):
+    def compile_describer(self, learningRate=0.1):
         """ Compiles describer using custom distance_loss """
-        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        rmsOptimizer = RMSprop(lr=learningRate)
         describerModel = self.describerStruct
         describerModel.compile(optimizer=rmsOptimizer,
                             loss=self.distance_loss(describerModel.layers[-1]))
         self.describerModel = describerModel
         return describerModel
 
-    def compile_adversarial(self, learningRate=0.1, decay=0.1):
+    def compile_adversarial(self, learningRate=0.1):
         """ Compiles adversarial model as generator -> discriminator """
-        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        rmsOptimizer = RMSprop(lr=learningRate)
         binaryLoss = 'binary_crossentropy'
         # adversarial built by passing generator output through discriminator
         adversarialModel = Sequential()
@@ -311,11 +311,11 @@ class Image_Generator():
         self.adversarialModel = adversarialModel
         return adversarialModel
 
-    def compile_creative(self, learningRate=0.1, decay=0.1):
+    def compile_creative(self, learningRate=0.1):
         """
         Compiles creative model as generator -> describer using distance_loss
         """
-        rmsOptimizer = RMSprop(lr=learningRate, decay=decay)
+        rmsOptimizer = RMSprop(lr=learningRate)
 
         creativeModel = Sequential()
         creativeModel.add(self.generatorStruct)
