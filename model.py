@@ -492,15 +492,23 @@ class Image_Generator():
 
             if (((i % saveInt) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
-                while True:
-                    t = input('t: ')
-                    if t == 'break':
-                        break
-                    v = text_to_cls(t)
-                    v = np.expand_dims(v, axis=1).T
-                    p = self.image_from_textVec(v)
-                    plt.imshow(p[0, :, :, :])
-                    plt.show()
+                captions, vecs, _ = dataObj.fetch_batch(1)
+                vec = np.expand_dims(vecs[0], axis=1).T
+                p = self.image_from_textVec(vec)
+                plt.imshow(p[0, :, :, :])
+                plt.title(captions[1])
+                plt.savefig(f'training_data/Step_{curStep}')
+                plt.close()
+                
+                # while True:
+                #     t = input('t: ')
+                #     if t == 'break':
+                #         break
+                #     v = text_to_cls(t)
+                #     v = np.expand_dims(v, axis=1).T
+                #     p = self.image_from_textVec(v)
+                #     plt.imshow(p[0, :, :, :])
+                #     plt.show()
                 # self.generate_and_plot(n=10, name=curStep, show=False,
                 #                         outPath=f'training_data/{curStep}')
                 # plt.close()
