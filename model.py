@@ -21,7 +21,7 @@ from keras.optimizers import RMSprop
 import utils as u
 from cocoReader import CocoData
 from processing.image import decode_batchArray
-from processing.text import text_to_cls
+# from processing.text import text_to_cls
 
 
 class Image_Generator():
@@ -493,13 +493,14 @@ class Image_Generator():
             if (((i % saveInt) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
                 captions, vecs, _ = dataObj.fetch_batch(1)
+                print(captions, vecs)
                 vec = np.expand_dims(vecs[0], axis=1).T
                 p = self.image_from_textVec(vec)
                 plt.imshow(p[0, :, :, :])
-                plt.title(captions[1])
-                plt.savefig(f'training_data/Step_{curStep}')
+                plt.title(captions[0])
+                plt.savefig(f'training_data/Step_{i}')
                 plt.close()
-                
+
                 # while True:
                 #     t = input('t: ')
                 #     if t == 'break':
@@ -522,7 +523,7 @@ network.initialize_models()
 
 coco = CocoData()
 coco.load('CocoData')
-network.train_models(coco, iter=400, preIter=0, batchSize=200, saveInt=5)
+network.train_models(coco, iter=1000, preIter=0, batchSize=50, saveInt=50)
 
 ## PLOTTTING BONES ##
 # import numpy as np
