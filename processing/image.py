@@ -11,7 +11,7 @@ from wand.image import Image
 def load_and_filter_image(imPath):
     with Image(filename=imPath) as img:
         rowLen, colLen = img.size
-        if 0.6 < (rowLen / colLen) < 1.4:
+        if 0.6 < (rowLen / colLen) < 1.51:
             img.resize(512, 512)
             return np.array(img)
         else:

@@ -18,6 +18,7 @@ import keras.backend as K
 from keras.optimizers import RMSprop
 
 import utils as u
+from cocoReader import CocoData
 from processing.image import decode_batchArray
 
 

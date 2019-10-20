@@ -35,27 +35,33 @@ class CocoData():
             imIdx = {path_to_id(path) : path
                     for path in u.os.listdir(f'{cocoPath}/train2014')}
             i = 0
+            with open(f'{cocoPath}/annotations/image_counter.txt',mode='r') as f:
+                counter = f.read()
+                print(f'{counter} <------')
+                f.close()
+            seenImages = set()
             with open(captionPath, 'r') as captionFile:
                 captionData = json.load(captionFile)
                 capNum = len(captionData['annotations'])
-                for example in tqdm(captionData['annotations'], total=capNum):
-                    i +=1
-                    if i > 10:
+                for example in tqdm(captionData['annotations'], total=capNum, initial=int(counter.strip())):
+                    if i > 25000:
                         break
-
+                    i += 1
                     imgId = example['image_id']
-                    captionText = text.clean_text(example['caption'])
-                    imArray = image.load_and_filter_image(f"{imageFolder}/{imIdx[imgId]}")
-                    assert imArray.shape == (512, 512, 3), f'{imArray.shape}'
-                    # imArray = imread(f"{imageFolder}/{imIdx[imgId]}")[:,:,::-1]
-                    # encode caption and clean image
                     try:
+                        if imgId in seenImages:
+                            raise ValueError('seen image before.')
+                        seenImages.add(imgId)
+                        captionText = text.clean_text(example['caption'])
+                        imArray = image.load_and_filter_image(f'{imageFolder}/'
+                                                            f'{imIdx[imgId]}')
                         captionVec = text.text_to_cls(captionText)
-                        cleanedIm = image.filter_image(imArray, outDim=480)
                         yield (captionText, captionVec, imArray)
                     except Exception as e:
                         print(f'ERROR: {e}')
                         yield None
+            with open(f'{cocoPath}/annotations/image_counter.txt', mode='w') as f:
+                f.write(str(int(counter.strip())+1000))
 
         if cocoPath:
             error_filter = lambda elt : elt != None
@@ -90,9 +96,4 @@ class CocoData():
 
 
 coco = CocoData('data/inData/coco2014')
-for elt in coco.trainIdx.values():
-    im = elt[2]
-    plt.imshow(im)
-    plt.title(elt[0])
-    plt.show()
-coco.save('CocoData')
+coco.save('CocoData1')
