@@ -66,7 +66,7 @@ class CocoData():
         if cocoPath:
             error_filter = lambda elt : elt != None
             trainIdx = {i : dataTup for i, dataTup
-                        in tqdm(enumerate(coco_reader(cocoPath)))
+                        in enumerate(coco_reader(cocoPath))
                         if error_filter(dataTup)}
             self.trainIdx = trainIdx
             self.indexSize = len(trainIdx)
@@ -92,7 +92,10 @@ class CocoData():
 
     def fetch_batch(self, batchSize):
         """ Fetches random batch of batchSize from trainIdx """
-        batchIds = np.random.randint(0, self.indexSize, size=batchSize)
+        # TODO: find support for random int choosing rather than choice
+        # batchIds = np.random.randint(0, self.indexSize, size=batchSize)
+        batchIds = np.random.choice([id for id in self.trainIdx.keys()],
+                                    size=batchSize)
         batchCaptions, batchTextVecs, batchImages = [], [], []
         for id in batchIds:
             sampleTup = self.trainIdx[id]

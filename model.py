@@ -488,7 +488,7 @@ network.initialize_models()
 
 coco = CocoData()
 coco.load('CocoData')
-
+print(coco.trainIdx[200])
 network.train_models(coco, 400, 200, saveInt=1)
 
 ## PLOTTTING BONES ##
