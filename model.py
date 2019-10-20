@@ -345,8 +345,7 @@ class Image_Generator():
         Uses generator model to generate image from BERT matrix
         testVec has size (m,1024)
         """
-        sampleImages = self.generatorStruct.predict(textVec)
-        return sampleImages
+        return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
     def train_models(self, dataObj, iter, batchSize, saveInt=500):
@@ -382,8 +381,6 @@ class Image_Generator():
             num_real = images.shape[0]
             answer_key = np.zeros(num_fake + num_real)
             answer_key[num_fake:] = 1
-            print(answer_key)
-
             return batch, answer_key
 
         def make_describer_batch(captions, images):
@@ -421,6 +418,18 @@ class Image_Generator():
             lr[3] = lr[3]
             return lr
 
+        for preStep in range(10):
+            captionStrings, captionVecs, images = dataObj.fetch_batch(batchSize)
+            (discriminatorX,
+            discriminatorY) = make_discriminator_batch(captionVecs, images)
+            (describerX,
+            describerY) = make_describer_batch(captionVecs, images)
+            discData = self.discriminatorModel.train_on_batch(discriminatorX,
+                                                            discriminatorY)
+            descData = self.describerModel.train_on_batch(describerX,
+                                                        describerY)
+
+
         for i in range(iter):
             # load array of current batch
             # batchArray = np.load(fileList[(i % fileNum)])
@@ -436,13 +445,14 @@ class Image_Generator():
             creativeY) = make_creative_batch(captionVecs, images)
             # train each model on respective batch
 
-            if i == 0:
-                self.lr = self.INIT_LR
+            # if i == 0:
+            #     self.lr = self.INIT_LR
 
-            K.set_value(self.discriminatorModel.optimizer.lr,self.lr[0])
-            K.set_value(self.describerModel.optimizer.lr,self.lr[1])
-            K.set_value(self.adversarialModel.optimizer.lr,self.lr[2])
-            K.set_value(self.creativeModel.optimizer.lr,self.lr[3])
+            # K.set_value(self.discriminatorModel.optimizer.lr,self.lr[0])
+            # K.set_value(self.describerModel.optimizer.lr,self.lr[1])
+            # K.set_value(self.adversarialModel.optimizer.lr,self.lr[2])
+            # K.set_value(self.creativeModel.optimizer.lr,self.lr[3])
+            # print('values set')
 
             discData = self.discriminatorModel.train_on_batch(discriminatorX,
                                                             discriminatorY)
@@ -462,18 +472,19 @@ class Image_Generator():
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
-            self.lr = update_lr(lr,discL,discA, descL, advL,
-                          advA, creativel, i)
+            # self.lr = update_lr(lr,discL,discA, descL, advL,
+            #               advA, creativel, i)
 
-            if (((i % saveInterval) == 0) and (i != 0)):
+            if (((i % saveInt) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
                 while True:
                     t = input('t: ')
                     if t == 'break':
                         break
-                    v = bc.encode([t])[0]
-                    p = self.generatorStruct.image_from_textVec(v)
-                    plt.imshow(p)
+                    v = text_to_cls(t)
+                    v = np.expand_dims(v, axis=1).T
+                    p = self.image_from_textVec(v)
+                    plt.imshow(p[0, :, :, :])
                     plt.show()
                 # self.generate_and_plot(n=10, name=curStep, show=False,
                 #                         outPath=f'training_data/{curStep}')
@@ -488,8 +499,7 @@ network.initialize_models()
 
 coco = CocoData()
 coco.load('CocoData')
-print(coco.trainIdx[200])
-network.train_models(coco, 400, 200, saveInt=1)
+network.train_models(coco, 400, 20, saveInt=20)
 
 ## PLOTTTING BONES ##
 # import numpy as np
