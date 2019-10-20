@@ -375,7 +375,7 @@ class Image_Generator():
             Makes discriminator batch from real images and generated images
             Images must be (n,512,512,3)
             """
-            fake_set = image_from_textVec(captions)
+            fake_set = self.image_from_textVec(captions)
             batch = np.concatenate((fake_set,images),axis=0)
 
             num_fake = fake_set.shape[0]
@@ -424,16 +424,16 @@ class Image_Generator():
         for i in range(iter):
             # load array of current batch
             # batchArray = np.load(fileList[(i % fileNum)])
-            captionList, vecList, imList = dataObj.fetch_batch(batchSize)
+            captionStrings, captionVecs, images = dataObj.fetch_batch(batchSize)
             # make batches for each model from batchArray
             (discriminatorX,
-            discriminatorY) = make_discriminator_batch(captions, images)
+            discriminatorY) = make_discriminator_batch(captionVecs, images)
             (describerX,
-            describerY) = make_describer_batch(captions, images)
+            describerY) = make_describer_batch(captionVecs, images)
             (adversarialX,
-            adversarialY) = make_adversarial_batch(captions)
+            adversarialY) = make_adversarial_batch(captionVecs)
             (creativeX,
-            creativeY) = make_creative_batch(captions, images)
+            creativeY) = make_creative_batch(captionVecs, images)
             # train each model on respective batch
 
             if i == 0:

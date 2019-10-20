@@ -102,7 +102,7 @@ class CocoData():
             batchCaptions.append(sampleTup[0])
             batchTextVecs.append(sampleTup[1])
             batchImages.append(sampleTup[2])
-        return (batchCaptions, batchTextVecs, batchImages)
+        return (batchCaptions, batchTextVecs, np.array(batchImages))
 
 
 # coco = CocoData('data/inData/coco2014')
