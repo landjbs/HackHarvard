@@ -95,5 +95,5 @@ class CocoData():
         return self.trainIdx[np.random.randint(0, self.indexSize, size=batchSize)]
 
 
-coco = CocoData('data/inData/coco2014')
-coco.save('CocoData1')
+# coco = CocoData('data/inData/coco2014')
+# coco.save('CocoData1')

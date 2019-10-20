@@ -20,6 +20,7 @@ from keras.optimizers import RMSprop
 import utils as u
 from cocoReader import CocoData
 from processing.image import decode_batchArray
+from processing.text import text_to_cls
 
 
 class Image_Generator():
@@ -354,13 +355,14 @@ class Image_Generator():
         and creative models on dataset with end-goal of text-to-image
         generation.
         Args:
-            folderPath:         Path to the folder of arrays on which to train
+            dataObj:            Object of the data on which to train. Must have
+                                method 'fetch_batch', which returns a tuple of
+                                lists of captionTexts, captionVecs, imageArrays. 
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
             saveInt (opt):      Interval at which to save examples and struct
                                 of generator model. Defaults 500.
         """
-        u.assert_type('folderPath', folderPath, str)
         u.assert_type('iter', iter, int)
         u.assert_type('batchSize', batchSize, int)
         u.assert_pos('iter', iter)
@@ -468,21 +470,29 @@ class Image_Generator():
 
             if (((i % saveInterval) == 0) and (i != 0)):
                 # TODO: imp generate_and_plot
-                self.generate_and_plot(n=10, name=curStep, show=False,
-                                        outPath=f'training_data/{curStep}')
-                plt.close()
-                self.generatorStruct.save('training_data/'
-                                            f'generatorStruct_{curStep}.h5')
+                while True:
+                    t = input('t: ')
+                    if t == 'break':
+                        break
+                    v = bc.encode([t])[0]
+                    p = self.generatorStruct.image_from_textVec(v)
+                    plt.imshow(p)
+                    plt.show()
+                # self.generate_and_plot(n=10, name=curStep, show=False,
+                #                         outPath=f'training_data/{curStep}')
+                # plt.close()
+                # self.generatorStruct.save('training_data/'
+                #                             f'generatorStruct_{curStep}.h5')
 
 
 
-x = Image_Generator()
-x.initialize_models()
-fake_captions = np.random.uniform(size=(20,1024))
-fake_images = np.random.uniform(low=0,high=1,size=(20,512,512,3))
-print(x.make_discriminator_batch(fake_captions,fake_images)[0].shape)
+network = Image_Generator()
+network.initialize_models()
 
+coco = CocoData()
+coco.load('CocoData')
 
+network.train_models(coco, 400, 200, saveInt=1)
 
 ## PLOTTTING BONES ##
 # import numpy as np
