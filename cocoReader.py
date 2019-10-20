@@ -43,7 +43,7 @@ class CocoData():
             with open(captionPath, 'r') as captionFile:
                 captionData = json.load(captionFile)
                 capNum = len(captionData['annotations'])
-                for example in tqdm(captionData['annotations'], total=capNum, initial=int(counter.strip())):
+                for example in tqdm(captionData['annotations'], total=capNum, initial=26000):
                     if i > 25000:
                         break
                     i += 1
