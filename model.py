@@ -357,7 +357,7 @@ class Image_Generator():
         Args:
             dataObj:            Object of the data on which to train. Must have
                                 method 'fetch_batch', which returns a tuple of
-                                lists of captionTexts, captionVecs, imageArrays. 
+                                lists of captionTexts, captionVecs, imageArrays.
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
             saveInt (opt):      Interval at which to save examples and struct
@@ -369,9 +369,6 @@ class Image_Generator():
         u.assert_pos('batchSize', batchSize)
 
         u.safe_make_folder('training_data')
-
-        fileList = [f'{file}' for file in os.listdir(folderPath)]
-        fileNum = len(fileList)
 
         def make_discriminator_batch(captions, images):
             """

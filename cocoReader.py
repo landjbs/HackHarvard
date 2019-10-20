@@ -90,9 +90,16 @@ class CocoData():
         self.trainIdx = u.load(f'{path}/trainIdx.sav')
         self.indexSize = len(self.trainIdx)
 
-    def fetch_batch(batchSize):
+    def fetch_batch(self, batchSize):
         """ Fetches random batch of batchSize from trainIdx """
-        return self.trainIdx[np.random.randint(0, self.indexSize, size=batchSize)]
+        batchIds = np.random.randint(0, self.indexSize, size=batchSize)
+        batchCaptions, batchTextVecs, batchImages = [], [], []
+        for id in batchIds:
+            sampleTup = self.trainIdx[id]
+            batchCaptions.append(sampleTup[0])
+            batchTextVecs.append(sampleTup[1])
+            batchImages.append(sampleTup[2])
+        return (batchCaptions, batchTextVecs, batchImages)
 
 
 # coco = CocoData('data/inData/coco2014')
