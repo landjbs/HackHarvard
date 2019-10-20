@@ -8,6 +8,7 @@ them to construct and image that is both realistic and topical.
 """
 
 import numpy as np
+from time import time
 import matplotlib.pyplot as plt
 from keras.models import Model, Sequential, load_model
 from keras.layers import (Input, Conv2D, Activation, LeakyReLU, Dropout,
@@ -348,7 +349,7 @@ class Image_Generator():
         return self.generatorStruct.predict(textVec)
 
     ## TRAINING ##
-    def train_models(self, dataObj, iter, batchSize, saveInt=500):
+    def train_models(self, dataObj, iter, preIter=10, batchSize=100, saveInt=200):
         """
         Train summarizer, generator, discriminator, describer, adversarial,
         and creative models on dataset with end-goal of text-to-image
@@ -359,6 +360,10 @@ class Image_Generator():
                                 lists of captionTexts, captionVecs, imageArrays.
             iter:               Number of iterations for which to train
             batchSize:          Size of batch with with to train
+            preIter (opt):      Number of pretraining iterations in which
+                                only the discriminator and describer train.
+                                Defaults to 10.
+            preBatch (opt):     Defaults to 100.
             saveInt (opt):      Interval at which to save examples and struct
                                 of generator model. Defaults 500.
         """
@@ -418,7 +423,8 @@ class Image_Generator():
             lr[3] = lr[3]
             return lr
 
-        for preStep in range(10):
+        # pretrain
+        for curPre in range(preIter):
             captionStrings, captionVecs, images = dataObj.fetch_batch(batchSize)
             (discriminatorX,
             discriminatorY) = make_discriminator_batch(captionVecs, images)
@@ -428,6 +434,10 @@ class Image_Generator():
                                                             discriminatorY)
             descData = self.describerModel.train_on_batch(describerX,
                                                         describerY)
+            discL, discA = round(discData[0], 3), round(discData[1], 3)
+            descL = round(descData, 3)
+            print(f'PreIter: {curPre}\n\tDiscriminator: [L: {discL} |'
+                f' A: {discA}]\n\tDescriber: [L: {descL}]{"-"*80}')
 
 
         for i in range(iter):
@@ -468,7 +478,7 @@ class Image_Generator():
             descL = round(descData, 3)
             advL, advA = round(advData[0], 3), round(advData[1], 3)
             creativeL = round(creativeData, 3)
-            print(f'Cur Step: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
+            print(f'Iter: {i}\n\tDiscriminator: [L: {discL} | A: {discA}]'
                 f'\n\tDescriber: [L: {descL}]\n\tAdversarial: [L: {advL} '
                 f'A: {advA}]\n\tCreative: [L {creativeL}]\n{"-"*80}')
 
