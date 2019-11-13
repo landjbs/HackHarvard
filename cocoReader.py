@@ -11,7 +11,7 @@ from cv2 import imread
 import matplotlib.pyplot as plt
 
 import utils as u
-import processing.text as text
+# import processing.text as text
 import processing.image as image
 
 # re matcher to pull id from image path
